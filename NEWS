@@ -1,0 +1,4 @@
+
+1.2:
+	License changed to LGPLv3
+	Added MVC lua table access model classes

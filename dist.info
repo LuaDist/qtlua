@@ -1,0 +1,15 @@
+--- This file is part of LuaDist project
+
+name = "qtlua"
+version = "1.2"
+
+desc = "The QtLua library aims to make Qt4 applications scriptable using the Lua scripting language."
+author = "Alexandre Becoulet"
+license = "GNU GPL"
+url = "https://savannah.nongnu.org/projects/libqtlua"
+maintainer = "Peter Kapec"
+
+depends = {
+	"lua ~> 5.1",
+	"libqt4 >= 4.2"
+}

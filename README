@@ -1,0 +1,9 @@
+
+The QtLua library aims to make Qt4 applications scriptable using the
+Lua scripting language.
+
+QtLua is released under the GNU LGPL v3 license.
+
+Project informations can be found online:
+http://www.nongnu.org/libqtlua/
+
