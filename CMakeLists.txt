@@ -4,7 +4,7 @@
 # For details see the COPYRIGHT file distributed with LuaDist.
 # Please note that the package source code is licensed under its own license.
 
-project ( qtlua CXX )
+project ( qtlua C CXX )
 cmake_minimum_required ( VERSION 2.8 )
 include ( cmake/dist.cmake )
 include ( lua )
@@ -14,7 +14,7 @@ find_package ( Qt4 REQUIRED )
 set ( QT_USE_QTUITOOLS 1 )
 include ( ${QT_USE_FILE} )
 
-# Find Lua 
+# Find Lua
 find_package ( Lua51 REQUIRED )
 include_directories ( ${LUA_INCLUDE_DIR} )
 
@@ -72,18 +72,18 @@ include_directories ( ${CMAKE_CURRENT_BINARY_DIR}/src )
 
 include_directories ( src src/internal src/QtLua )
 
-set ( QTLUA_LIB_SRCS src/qtluaconsole.cc src/qtluaenum.cc src/qtluafunction.cc src/qtluaitem.cc 
-  src/qtluaitemmodel.cc src/qtlualistitem.cc src/qtlualistiterator.cc src/qtluamember.cc 
-  src/qtluametacache.cc src/qtluamethod.cc src/qtluaplugin.cc src/qtluaqobjectwrapper.cc 
-  src/qtluaqtlib.cc src/qtluastate.cc src/qtluatableiterator.cc src/qtluauserdata.cc 
-  src/qtluavalue.cc src/qtluavalueref.cc src/qtluaqobjectiterator.cc src/qtluaenumiterator.cc 
-  src/qtluaproperty.cc src/qtluaqmetaobjecttable.cc src/qtluaqmetaobjectwrapper.cc 
-  src/qtluaitemselectionmodel.cc src/qtluatabletreekeys.cc src/qtluatabletreemodel.cc 
+set ( QTLUA_LIB_SRCS src/qtluaconsole.cc src/qtluaenum.cc src/qtluafunction.cc src/qtluaitem.cc
+  src/qtluaitemmodel.cc src/qtlualistitem.cc src/qtlualistiterator.cc src/qtluamember.cc
+  src/qtluametacache.cc src/qtluamethod.cc src/qtluaplugin.cc src/qtluaqobjectwrapper.cc
+  src/qtluaqtlib.cc src/qtluastate.cc src/qtluatableiterator.cc src/qtluauserdata.cc
+  src/qtluavalue.cc src/qtluavalueref.cc src/qtluaqobjectiterator.cc src/qtluaenumiterator.cc
+  src/qtluaproperty.cc src/qtluaqmetaobjecttable.cc src/qtluaqmetaobjectwrapper.cc
+  src/qtluaitemselectionmodel.cc src/qtluatabletreekeys.cc src/qtluatabletreemodel.cc
   src/qtluatabledialog.cc src/qtluatablegridmodel.cc )
 
 # Generate moc files
-set ( MOC_HEADERS src/QtLua/qtluaconsole.hh src/QtLua/qtluaitemselectionmodel.hh 
-  src/QtLua/qtluaitemmodel.hh src/QtLua/qtluatabletreemodel.hh src/QtLua/qtluatabledialog.hh 
+set ( MOC_HEADERS src/QtLua/qtluaconsole.hh src/QtLua/qtluaitemselectionmodel.hh
+  src/QtLua/qtluaitemmodel.hh src/QtLua/qtluatabletreemodel.hh src/QtLua/qtluatabledialog.hh
   src/QtLua/qtluastate.hh src/QtLua/qtluatablegridmodel.hh src/qtluaqtlib.hh )
 qt4_wrap_cpp ( MOC_OUTFILES ${MOC_HEADERS} )
 add_library ( qtlua ${QTLUA_LIB_SRCS} ${MOC_OUTFILES} )
@@ -92,7 +92,7 @@ target_link_libraries ( qtlua ${QT_LIBRARIES} ${LUA_LIBRARIES} )
 # qtlua app
 add_executable ( qtlua_app tools/qtlua/qtlua.cc )
 target_link_libraries ( qtlua_app qtlua )
-set_target_properties ( qtlua_app PROPERTIES OUTPUT_NAME qtlua CLEAN_DIRECT_OUTPUT 
+set_target_properties ( qtlua_app PROPERTIES OUTPUT_NAME qtlua CLEAN_DIRECT_OUTPUT
   1 )
 # tests
 include_directories ( test )
@@ -135,7 +135,7 @@ set_target_properties ( plugin PROPERTIES PREFIX "" )
 # plugin
 add_executable ( plugin_app examples/cpp/plugin/plugin_load.cc )
 target_link_libraries ( plugin_app qtlua )
-set_target_properties ( plugin_app PROPERTIES OUTPUT_NAME plugin CLEAN_DIRECT_OUTPUT 
+set_target_properties ( plugin_app PROPERTIES OUTPUT_NAME plugin CLEAN_DIRECT_OUTPUT
   1 )
 
 # proxy
@@ -174,7 +174,7 @@ install_executable ( qtlua_app )
 install_library ( qtlua )
 install ( TARGETS test_value test_table test_qobject_arg test_item DESTINATION ${INSTALL_TEST} COMPONENT Test )
 install_example ( examples/lua/hello INTO lua )
-install ( TARGETS console itemtreeview tablegridview tabletreeview plugin plugin_app 
-  console plugin plugin_app qhashproxy_value qlinkedlistproxy_string qlistproxy_string 
-  qmapproxy_string qvectorproxy_string qvectorproxy_userdata qobject_iter qobject_owner 
+install ( TARGETS console itemtreeview tablegridview tabletreeview plugin plugin_app
+  console plugin plugin_app qhashproxy_value qlinkedlistproxy_string qlistproxy_string
+  qmapproxy_string qvectorproxy_string qvectorproxy_userdata qobject_iter qobject_owner
   function ref global iterate DESTINATION ${INSTALL_EXAMPLE}/cpp COMPONENT Example )
