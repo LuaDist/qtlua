@@ -26,6 +26,7 @@
 #include <QPointer>
 
 #include <QtLua/qtluauserdata.hh>
+#include <QtLua/qtluametatype.hh>
 
 namespace QtLua {
 
@@ -33,7 +34,7 @@ namespace QtLua {
   class Value;
 
 /**
- * @short Qt meta member wrappers class (internal)
+ * @short Qt meta member wrappers class
  * @header internal/Member
  * @module {QObject wrapping}
  * @internal
@@ -44,6 +45,7 @@ namespace QtLua {
   class Member : public UserData
   {
     friend class QObjectWrapper;
+    friend class Value;
 
   public:
     QTLUA_REFTYPE(Member);

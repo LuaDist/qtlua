@@ -28,10 +28,10 @@
 
 namespace QtLua {
 
-QModelIndex Item::model_index() const
+QModelIndex Item::model_index(int column) const
 {
   assert(_model);
-  return _model->createIndex(_row, 0, (void*)this);
+  return _model->createIndex(_row, column, (void*)this);
 }
 
 void Item::set_row(int row)

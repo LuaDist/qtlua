@@ -32,7 +32,7 @@ namespace QtLua {
   class QObjectIterator;
 
 /**
- * @short QObject wrapper class (internal)
+ * @short QObject wrapper class
  * @header internal/QObjectWrapper
  * @module {QObject wrapping}
  * @internal
@@ -110,7 +110,15 @@ namespace QtLua {
 
   private:
 
-    typedef QHash<int, Value> lua_slots_hash_t;
+    struct LuaSlot
+    {
+      inline LuaSlot(const Value &v, int sigindex);
+
+      Value _value;
+      int _sigindex;
+    };
+
+    typedef QHash<int, LuaSlot> lua_slots_hash_t;
 
     State &_ls;
     QObject *_obj;

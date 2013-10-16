@@ -29,7 +29,7 @@
 namespace QtLua {
 
   ValueRef::ValueRef(const Value &table, const Value &key)
-    : Value(table._st),
+    : Value(*table._st),
       _key(key)
   {
     assert(table._st == key._st);
@@ -38,8 +38,8 @@ namespace QtLua {
 
   template <typename T>
   ValueRef::ValueRef(const Value &table, const T &key)
-    : Value(table._st),
-      _key(Value(table._st))
+    : Value(*table._st),
+      _key(Value(*table._st))
   {
     _key = key;
     init(table);
@@ -53,37 +53,37 @@ namespace QtLua {
 
   const ValueRef & ValueRef::operator=(Bool n) const
   {
-    *this = Value(_st, n);
+    *this = Value(*_st, n);
     return *this;
   }
 
   const ValueRef & ValueRef::operator=(double n) const
   {
-    *this = Value(_st, n);
+    *this = Value(*_st, n);
     return *this;
   }
 
   const ValueRef & ValueRef::operator=(int n) const
   {
-    *this = Value(_st, (double)n);
+    *this = Value(*_st, (double)n);
     return *this;
   }
 
   const ValueRef & ValueRef::operator=(const String &str) const
   {
-    *this = Value(_st, str);
+    *this = Value(*_st, str);
     return *this;
   }
 
   const ValueRef & ValueRef::operator=(const UserData::ptr &ud) const
   {
-    *this = Value(_st, ud);
+    *this = Value(*_st, ud);
     return *this;
   }
 
   const ValueRef & ValueRef::operator=(QObject *obj) const
   {
-    *this = Value(_st, obj);
+    *this = Value(*_st, obj);
     return *this;
   }
 

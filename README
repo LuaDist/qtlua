@@ -4,6 +4,30 @@ Lua scripting language.
 
 QtLua is released under the GNU LGPL v3 license.
 
-Project informations can be found online:
+Project documentation can be found online:
 http://www.nongnu.org/libqtlua/
+
+Build and install
+=================
+
+The library now comes with two build systems:
+
+  - The main GNU autotools build system which is suited for GNU/Linux:
+
+    cd libqtlua-x.x.x
+    mkdir bld
+    cd bld
+    ../configure
+    make
+    make install
+
+  - The alternative CMake build system which is suited for any
+    platform. It needs CMake installed to work:
+
+    cd libqtlua-x.x.x
+    mkdir bld
+    cd bld
+    cmake ..
+    make
+    make install
 

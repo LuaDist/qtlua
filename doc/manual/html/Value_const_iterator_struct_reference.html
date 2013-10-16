@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ <meta name="Generator" content="MKDOC " />
+ <title>QtLua library manual </title>
+ <link rel="stylesheet" href="mkdoc.css" />
+ <style type="text/css">
+
+  .sec_hidden { display: none; }
+  .sec_shown {}
+ </style>
+</head><body>
+<div class="page"><div class="head"><img class="headlogo" src="logo-small.png" alt="logo" /><div class="headlinks"><a href="Table_of_contents.html">Table of contents</a>
+ &nbsp; <a href="API_documentation.html">API documentation</a>
+</div><div class="navlinks"><a href="index.html" accesskey="t">Top</a> &nbsp; <a href="Value_List_struct_reference.html"  accesskey="p" id="nav_prev">Previous </a> &nbsp; <a href="API_documentation.html"  accesskey="u" id="nav_up"> Up </a> &nbsp; <a href="Value_iterator_struct_reference.html"  accesskey="n" id="nav_next"> Next</a></div>
+</div><div class="content"><div style="clear: both; height:20px;"></div>
+<h1>Value::const_iterator struct reference<br /><span class="subtitle">
+[Base module]</span>
+</h1><div class="sec_content1">
+<div style="clear: both; height:20px;"></div>
+</div><h2>Declaration<a href="#_Declaration30" id="_Declaration30" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+<div class="codebox"><code><span class="codedir">#include</span> &lt;QtLua/Value&gt;<br /><br /><span class="codekw">namespace</span> QtLua {<br />  <span class="codekw">class</span> Value {<br />    <span class="codekw">struct</span> const_iterator;<br />  };<br />};<br /></code></div><p> This struct is a member of the <a href="Value_class_reference.html">Value</a> class.</p>
+</div><h2>Description<a href="#_Description31" id="_Description31" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+<p>This iterator class allow iteration through table like lua values directly from C++ code. Modification of <a href="Value_class_reference.html">Value</a> object returned by Value::const_iterator::<a href="Value_const_iterator_struct_reference.html#__619">value</a> <strong>doesn't modify</strong> traversed container.</p>
+<p>See also Value::<a href="Value_iterator_struct_reference.html">iterator</a> struct.</p>
+</div><h2>Members<a href="#_Members30" id="_Members30" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+</div><h3>Type<a href="#_Type1" id="_Type1" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li><span class="listitem"><span class="member_prefix">typedef <em> [...] </em> </span><span class="member_signature"><span class="member_name"><a href="Value_iterator__internal_class_members.html#__624">iterator_category</a></span></span></span></li>
+</ul>
+</div><h3>Functions<a href="#_Functions29" id="_Functions29" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li><span class="listitem"><span class="member_prefix"></span><span class="member_signature"><span class="member_name"><a href="Value_const_iterator_struct_reference.html#__616">const_iterator</a></span>(<span class="member_params"><span class="member_param">const Value::iterator &amp;i</span>)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix"></span><span class="member_signature"><span class="member_name"><a href="Value_const_iterator_struct_reference.html#__617">const_iterator</a></span>(<span class="member_params">)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">Value </span><span class="member_signature"><span class="member_name"><a href="Value_iterator__internal_class_members.html#__625">key</a></span>(<span class="member_params">) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">bool </span><span class="member_signature"><span class="member_name"><a href="Value_iterator__internal_class_members.html#__626">operator!=</a></span>(<span class="member_params"><span class="member_param">const Value::iterator_ &amp;i</span>) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">Value </span><span class="member_signature"><span class="member_name"><a href="Value_const_iterator_struct_reference.html#__618">operator*</a></span>(<span class="member_params">) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">Value::iterator_ &amp; </span><span class="member_signature"><span class="member_name"><a href="Value_iterator__internal_class_members.html#__627">operator++</a></span>(<span class="member_params">)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">Value::iterator_ </span><span class="member_signature"><span class="member_name"><a href="Value_iterator__internal_class_members.html#__628">operator++</a></span>(<span class="member_params"><span class="member_param">int </span>)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">bool </span><span class="member_signature"><span class="member_name"><a href="Value_iterator__internal_class_members.html#__629">operator==</a></span>(<span class="member_params"><span class="member_param">const Value::iterator_ &amp;i</span>) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">Value </span><span class="member_signature"><span class="member_name"><a href="Value_const_iterator_struct_reference.html#__619">value</a></span>(<span class="member_params">) const</span></span></span></li>
+</ul>
+</div><h2>Members detail<a href="#_Members_detail30" id="_Members_detail30" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+</div><div class="divmember public_member"><h3><span class="member_prefix"></span><span class="member_signature"><span class="member_name">const_iterator</span>(<span class="member_params"><span class="member_param">const Value::<a href="Value_iterator_struct_reference.html">iterator</a> &amp;i</span>)</span></span><a href="#__616" id="__616" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Create from non const iterator</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix"></span><span class="member_signature"><span class="member_name">const_iterator</span>(<span class="member_params">)</span></span><a href="#__617" id="__617" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Create a non uninitialized Value::<a href="Value_const_iterator_struct_reference.html">const_iterator</a>.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix"><a href="Value_class_reference.html">Value</a> </span><span class="member_signature"><span class="member_name">operator*</span>(<span class="member_params">) const</span></span><a href="#__618" id="__618" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>See Value::const_iterator::<a href="Value_const_iterator_struct_reference.html#__619">value</a> function.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix"><a href="Value_class_reference.html">Value</a> </span><span class="member_signature"><span class="member_name">value</span>(<span class="member_params">) const</span></span><a href="#__619" id="__619" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Get current entry value.</p>
+</div></div></div><div class="foot"><p class="generated"><a style="float: right;" href="http://validator.w3.org/check?uri=referer">Valid XHTML 1.0 Strict</a>Generated by diaxen on Sun Jan  8 22:46:02 2012 using <a href="http://www.nongnu.org/mkdoc/">MkDoc</a></p></div></body></html>

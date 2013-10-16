@@ -29,7 +29,7 @@ namespace QtLua {
 
   /**
    * @short Qt Model/View lua table internal state class
-   * @header internal/Table
+   * @header internal/TableTreeKeys
    * @module {Model/View}
    * @internal
    *

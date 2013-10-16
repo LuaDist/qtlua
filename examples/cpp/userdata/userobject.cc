@@ -20,9 +20,11 @@
 
 #include <QtLua/UserObject>
 
-/* anchor 1 */
+								/* anchor 1 */
 class Test : public QtLua::UserObject<Test>
 {
+  QTLUA_USEROBJECT(Test);
+
   QTLUA_PROPERTY(int, _value);
 
 public:
@@ -31,12 +33,11 @@ public:
   {
   }
 
-  static const member_s member_table[];
 };
 
-const Test::member_s Test::member_table[] = {
-  QTLUA_PROPERTY_ENTRY(Test, _value),
-};
+QTLUA_PROPERTIES_TABLE(Test,
+  QTLUA_PROPERTY_ENTRY(Test, "value", _value)
+);
 /* anchor end */
 
 #include <QtLua/State>

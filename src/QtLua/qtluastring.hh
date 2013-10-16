@@ -58,7 +58,9 @@ namespace QtLua {
     /** Replace next @tt % character in string with given integer  */
     inline String & arg(int arg);
     /** @tt{const char *} cast operator */
-    inline operator const char * ();
+    inline operator const char * () const;
+    /** @ref QString cast operator */
+    inline QString to_qstring() const;
   };
 
 }

@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include <QtLua/Value>
+#include <QtLua/State>
 #include <QtLua/Iterator>
 
 #include <internal/TableIterator>
@@ -31,30 +32,33 @@ extern "C" {
 
 namespace QtLua {
   
-TableIterator::TableIterator(lua_State *st, const Value &table)
-  : _st(st),
+TableIterator::TableIterator(State &st, const Value &table)
+  : _st(&st),
     _key(Value(st)),
     _value(Value(st)),
     _more(true)
 {
-  lua_pushlightuserdata(_st, this);
+  lua_pushlightuserdata(_st->_lst, this);
   table.push_value();
-  assert(lua_type(_st, -1) == Value::TTable);
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  assert(lua_type(_st->_lst, -1) == Value::TTable);
+  lua_rawset(_st->_lst, LUA_REGISTRYINDEX);
 
   fetch();
 }
 
 TableIterator::~TableIterator()
 {
-  lua_pushlightuserdata(_st, this);
-  lua_pushnil(_st);
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  if (_st)
+    {
+      lua_pushlightuserdata(_st->_lst, this);
+      lua_pushnil(_st->_lst);
+      lua_rawset(_st->_lst, LUA_REGISTRYINDEX);
+    }
 }
 
 bool TableIterator::more() const
 {
-  return _more;
+  return _st && _more;
 }
 
 void TableIterator::next()
@@ -64,25 +68,28 @@ void TableIterator::next()
 
 void TableIterator::fetch()
 {
+  if (!_st)
+    return;
+
   assert(_more);
 
-  lua_pushlightuserdata(_st, this);
-  lua_rawget(_st, LUA_REGISTRYINDEX);
+  lua_pushlightuserdata(_st->_lst, this);
+  lua_rawget(_st->_lst, LUA_REGISTRYINDEX);
 
   _key.push_value();
 
-  if (lua_next(_st, -2))
+  if (lua_next(_st->_lst, -2))
     {
-      _key = Value(_st, -2);
-      _value = Value(_st, -1);
-      lua_pop(_st, 2);
+      _key = Value(-2, _st);
+      _value = Value(-1, _st);
+      lua_pop(_st->_lst, 2);
     }
   else
     {
       _more = false;
     }
 
-  lua_pop(_st, 1);
+  lua_pop(_st->_lst, 1);
 }
 
 Value TableIterator::get_key() const
@@ -97,11 +104,14 @@ Value TableIterator::get_value() const
 
 ValueRef TableIterator::get_value_ref()
 {
-  lua_pushlightuserdata(_st, this);
-  lua_rawget(_st, LUA_REGISTRYINDEX);
-  Value val(_st, -1);
+  if (!_st)
+    throw String("Can't iterate with QtLua::TableIterator which has no more associated QtLua::State object");
+
+  lua_pushlightuserdata(_st->_lst, this);
+  lua_rawget(_st->_lst, LUA_REGISTRYINDEX);
+  Value val(1, _st);
   ValueRef ref(val, _key);
-  lua_pop(_st, 1);
+  lua_pop(_st->_lst, 1);
   return ref;
 }
 

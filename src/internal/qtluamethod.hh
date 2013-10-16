@@ -30,7 +30,7 @@
 namespace QtLua {
 
 /**
- * @short Qt method wrapper class (internal)
+ * @short Qt method wrapper class
  * @header internal/Property
  * @module {QObject wrapping}
  * @internal

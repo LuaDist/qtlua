@@ -38,7 +38,7 @@ Plugin::Plugin(const String &filename)
 }
 
 Plugin::Loader::Loader(const String &filename)
-  : QPluginLoader(filename)
+  : QPluginLoader(filename.to_qstring())
 {
   if (!load())
     throw String("Unable to load plugin '%': %")

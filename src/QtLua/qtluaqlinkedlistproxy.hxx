@@ -50,7 +50,7 @@ namespace QtLua {
     if (!_linkedlist)
       throw String("Can not iterate on null container.");
 
-    return QTLUA_REFNEW(ProxyIterator, ls, *this);
+    return QTLUA_REFNEW(ProxyIterator, &ls, *this);
   }
 
   template <class Container>
@@ -66,7 +66,13 @@ namespace QtLua {
   }
 
   template <class Container>
-  QLinkedListProxy<Container>::ProxyIterator::ProxyIterator(State &ls, const Ref<QLinkedListProxy> &proxy)
+  String QLinkedListProxy<Container>::get_type_name() const
+  {
+    return type_name<Container>();
+  }
+
+  template <class Container>
+  QLinkedListProxy<Container>::ProxyIterator::ProxyIterator(State *ls, const Ref<QLinkedListProxy> &proxy)
     : _ls(ls),
       _proxy(proxy),
       _it(_proxy->_linkedlist->begin()),

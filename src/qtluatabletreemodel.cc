@@ -24,11 +24,18 @@
 
 namespace QtLua {
 
+  void TableTreeModel::check_state() const
+  {
+    if (!_st)
+      throw String("Can't use QtLua::TableTreeModel without associated QtLua::State object");
+  }
+
   TableTreeModel::TableTreeModel(const Value &root, Attributes attr, QObject *parent)
     : QAbstractItemModel(parent),
-      _st(root.get_state()),
-      _table(new TableTreeKeys(root, attr))
+      _st(root.get_state())
   {
+    check_state();
+    _table = new TableTreeKeys(root, attr);
   }
 
   TableTreeModel::~TableTreeModel()
@@ -53,6 +60,9 @@ namespace QtLua {
 
   QModelIndex TableTreeModel::index(int row, int column, const QModelIndex &parent) const
   {
+    if (!_st)
+      return QModelIndex();
+
     TableTreeKeys *t = table_from_index(parent);
     assert(t);
 
@@ -66,7 +76,7 @@ namespace QtLua {
 
   QModelIndex TableTreeModel::parent(const QModelIndex &index) const
   {
-    if (!index.isValid())
+    if (!index.isValid() || !_st)
       return QModelIndex();
 
     TableTreeKeys *t = static_cast<TableTreeKeys*>(index.internalPointer());
@@ -80,6 +90,9 @@ namespace QtLua {
 
   int TableTreeModel::rowCount(const QModelIndex &parent) const
   {
+    if (!_st)
+      return 0;
+
     TableTreeKeys *t = table_from_index(parent);
 
     if (t == NULL)
@@ -91,6 +104,9 @@ namespace QtLua {
 
   bool TableTreeModel::hasChildren(const QModelIndex &parent) const
   {
+    if (!_st)
+      return false;
+
     TableTreeKeys *t = table_from_index(parent);
 
     return t != NULL;
@@ -98,12 +114,15 @@ namespace QtLua {
 
   int TableTreeModel::columnCount(const QModelIndex &parent) const
   {
+    if (!_st)
+      return 0;
+
     return _table->_attr & HideType ? 2 : 3;
   }
 
   QVariant TableTreeModel::data(const QModelIndex &index, int role) const
   {
-    if (!index.isValid())
+    if (!index.isValid() || !_st)
       return QVariant();
 
     TableTreeKeys *t = static_cast<TableTreeKeys*>(index.internalPointer());
@@ -135,8 +154,10 @@ namespace QtLua {
 
   Value TableTreeModel::get_value(const QModelIndex &index) const
   {
+    check_state();
+
     if (!index.isValid())
-      return Value(_st);
+      return Value(*_st);
 
     TableTreeKeys *t = static_cast<TableTreeKeys*>(index.internalPointer());
 
@@ -147,12 +168,14 @@ namespace QtLua {
       case ColValue:
 	return t->get_value(index.row());
       default:
-	return Value(_st);
+	return Value(*_st);
       }
   }
 
   TableTreeModel::Attributes TableTreeModel::get_attr(const QModelIndex &index) const
   {
+    check_state();
+
     if (!index.isValid())
       return Attributes();
 
@@ -162,7 +185,7 @@ namespace QtLua {
 
   Qt::ItemFlags TableTreeModel::flags(const QModelIndex &index) const
   {
-    if (!index.isValid())
+    if (!index.isValid() || !_st)
       return 0;
 
     TableTreeKeys *t = static_cast<TableTreeKeys*>(index.internalPointer());
@@ -193,7 +216,7 @@ namespace QtLua {
 
   bool TableTreeModel::setData(const QModelIndex & index, const QVariant & value, int role)
   {
-    if (!index.isValid())
+    if (!index.isValid() || !_st)
       return false;
 
     if (role != Qt::EditRole)
@@ -210,7 +233,7 @@ namespace QtLua {
 
       Value oldvalue(t->get_value(index.row()));
       Value::ValueType oldtype = oldvalue.type();
-      Value newvalue(_st.eval_expr(t->_attr & EditLuaEval, input));
+      Value newvalue(_st->eval_expr(t->_attr & EditLuaEval, input));
       Value::ValueType newtype = newvalue.type();
 
       switch (index.column())
@@ -246,7 +269,7 @@ namespace QtLua {
 	    throw String("An entry with the same key already exists.");
 
 	  Value old = t->get_value(index.row());
-	  t->set_value(index.row(), Value(_st));
+	  t->set_value(index.row(), Value(*_st));
 	  t->set_key(index.row(), newvalue);
 	  t->set_value(index.row(), old);
 	  return true;
@@ -257,7 +280,7 @@ namespace QtLua {
 	}
 
     } catch (const String &s) {
-      QMessageBox::critical(0, "Error", String("Value update error: ") + s);
+      QMessageBox::critical(0, "Error", QString("Value update error: ") + s.to_qstring());
     }
 
     return false;
@@ -265,6 +288,9 @@ namespace QtLua {
 
   bool TableTreeModel::removeRows(int row, int count, const QModelIndex &parent)
   {
+    if (!_st)
+      return false;
+
     assert(count);
 
     TableTreeKeys *t = table_from_index(parent);
@@ -277,7 +303,7 @@ namespace QtLua {
     // set lua table to nil and delete nested tables
     for (int i = row; i < row + count; i++)
       {
-	QTLUA_PROTECT(t->set_value(i, Value(_st)));
+	QTLUA_PROTECT(t->set_value(i, Value(*_st)));
 
 	if (TableTreeKeys *c = t->_entries[i]._table)
 	  delete c;
@@ -298,6 +324,9 @@ namespace QtLua {
 
   bool TableTreeModel::insertRows(int row, int count, const QModelIndex &parent)
   {
+    if (!_st)
+      return false;
+
     assert(count);
 
     TableTreeKeys *t = table_from_index(parent);
@@ -308,7 +337,7 @@ namespace QtLua {
     beginInsertRows(parent, row, row + count - 1);
 
     for (int i = 0; i < count; i++)
-      t->_entries.insert(row, TableTreeKeys::Entry(Value(_st)));
+      t->_entries.insert(row, TableTreeKeys::Entry(Value(*_st)));
 
     for (int i = row + count; i < (int)t->count(); i++)
       if (TableTreeKeys *c = t->_entries[i]._table)
@@ -321,7 +350,7 @@ namespace QtLua {
 
   QVariant TableTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
   {
-    if (role != Qt::DisplayRole)
+    if (role != Qt::DisplayRole || !_st)
       return QVariant();
 
     if (orientation == Qt::Vertical)
@@ -342,7 +371,7 @@ namespace QtLua {
 
   QModelIndex TableTreeModel::buddy(const QModelIndex &index) const
   {
-    if (!index.isValid())
+    if (!index.isValid() || !_st)
       return index;
 
     TableTreeKeys *t = static_cast<TableTreeKeys*>(index.internalPointer());

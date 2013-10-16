@@ -83,7 +83,7 @@ public:
   /**
    * This function is called when a lua operator is used with a @ref
    * UserData object. The default implementation throws an error
-   * message. The @ref support function should be reimplemented along
+   * message. The @ref support function must be reimplemented along
    * with this function.
    *
    * @param op Specify invoked lua operator (see @ref Value::Operation).
@@ -94,10 +94,11 @@ public:
   virtual Value meta_operation(State &ls, Value::Operation op, const Value &a, const Value &b);
 
   /** 
-   * This functions is called when a table read access operation is
+   * This function is called when a table read access operation is
    * attempted on a userdata object. The default implementation throws
-   * an error message. The @ref support function should be
-   * reimplemented along with this function.
+   * an error message. The @ref support function must be
+   * reimplemented along with this function to report @ref
+   * Value::OpIndex as supported.
    * 
    * @param key Value used as table index.
    * @returns Table access result value.
@@ -105,10 +106,11 @@ public:
   virtual Value meta_index(State &ls, const Value &key);
 
   /**
-   * This functions is called when a table write access operation is
+   * This function is called when a table write access operation is
    * attempted on a userdata object. The default implementation throws
-   * an error message. The @ref support function should be
-   * reimplemented along with this function.
+   * an error message. The @ref support function must be
+   * reimplemented along with this function to report @ref
+   * Value::OpNewindex as supported.
    *
    * @param key Value used as table index.
    * @param value Value to put in table.
@@ -116,10 +118,21 @@ public:
   virtual void meta_newindex(State &ls, const Value &key, const Value &value);
 
   /**
+   * This function returns @tt true if either the @ref Value::OpIndex
+   * operation or the @ref Value::OpNewindex operation is supported and
+   * an entry is associated to the given key.
+   *
+   * The default implementation returns @tt{!meta_index(ls,
+   * key).is_nil()} or @tt false if @ref meta_index throws.
+   */
+  virtual bool meta_contains(State &ls, const Value &key);
+
+  /**
    * This function is called when a function invokation operation is
    * performed on a userdata object. The default implementation throws
-   * an error message. The @ref support function should be
-   * reimplemented along with this function.
+   * an error message. The @ref support function must be
+   * reimplemented along with this function to report @ref Value::OpCall as
+   * supported.
    *
    * @param args List of passed arguments.
    * @returns List of returned values.
@@ -129,8 +142,9 @@ public:
   /**
    * This function may return an @ref Iterator object used to iterate
    * over an userdata object. The default implementation throws an
-   * error message. The @ref support function should be reimplemented
-   * along with this function.
+   * error message. The @ref support function must be reimplemented
+   * along with this function to report @ref Value::OpIterate as
+   * supported.
    *
    * @returns an @ref Iterator based iterator object.
    */

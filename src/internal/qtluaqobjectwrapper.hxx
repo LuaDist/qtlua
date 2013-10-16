@@ -54,6 +54,12 @@ namespace QtLua {
     return _ls;
   }
 
+  QObjectWrapper::LuaSlot::LuaSlot(const Value &v, int sigindex)
+    : _value(v),
+      _sigindex(sigindex)
+  {
+  }
+
 }
 
 #endif

@@ -1,7 +1,7 @@
 --- This file is part of LuaDist project
 
 name = "qtlua"
-version = "1.2"
+version = "1.4"
 
 desc = "The QtLua library aims to make Qt4 applications scriptable using the Lua scripting language."
 author = "Alexandre Becoulet"

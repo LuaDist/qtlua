@@ -71,6 +71,18 @@ namespace QtLua {
   }
 
   template <class Container, bool resize>
+  bool QVectorProxyRo<Container, resize>::meta_contains(State &ls, const Value &key)
+  {
+    try {
+      int index = (unsigned int)key.to_number() - 1;
+
+      return index >= 0 && index < _vector->size();
+    } catch (String &e) {
+      return false;
+    }
+  }
+
+  template <class Container, bool resize>
   Value QVectorProxyRo<Container, resize>::meta_operation(State &ls, Value::Operation op, const Value &a, const Value &b)
   {
     switch (op)
@@ -116,6 +128,12 @@ namespace QtLua {
   }
 
   template <class Container, bool resize>
+  String QVectorProxyRo<Container, resize>::get_type_name() const
+  {
+    return type_name<Container>();
+  }
+
+  template <class Container, bool resize>
   void QVectorProxy<Container, resize>::meta_newindex(State &ls, const Value &key, const Value &value)
   {
     if (!_vector)
@@ -150,11 +168,11 @@ namespace QtLua {
     if (!_vector)
       throw String("Can not iterate on null container.");
 
-    return QTLUA_REFNEW(ProxyIterator, ls, *this);
+    return QTLUA_REFNEW(ProxyIterator, &ls, *this);
   }
 
   template <class Container, bool resize>
-  QVectorProxyRo<Container, resize>::ProxyIterator::ProxyIterator(State &ls, const Ref<QVectorProxyRo> &proxy)
+  QVectorProxyRo<Container, resize>::ProxyIterator::ProxyIterator(State *ls, const Ref<QVectorProxyRo> &proxy)
     : _ls(ls),
       _proxy(proxy),
       _it(0)
@@ -176,7 +194,7 @@ namespace QtLua {
   template <class Container, bool resize>
   Value QVectorProxyRo<Container, resize>::ProxyIterator::get_key() const
   {
-    return Value(_ls, (int)_it);
+    return Value(_ls, (int)_it + 1);
   }
 
   template <class Container, bool resize>
@@ -188,7 +206,7 @@ namespace QtLua {
   template <class Container, bool resize>
   ValueRef QVectorProxyRo<Container, resize>::ProxyIterator::get_value_ref()
   {
-    return ValueRef(Value(_ls, _proxy), Value(_ls, (double)_it));
+    return ValueRef(Value(_ls, _proxy), Value(_ls, (double)_it + 1));
   }
 
 }

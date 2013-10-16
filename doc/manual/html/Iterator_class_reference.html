@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ <meta name="Generator" content="MKDOC " />
+ <title>QtLua library manual </title>
+ <link rel="stylesheet" href="mkdoc.css" />
+ <style type="text/css">
+
+  .sec_hidden { display: none; }
+  .sec_shown {}
+ </style>
+</head><body>
+<div class="page"><div class="head"><img class="headlogo" src="logo-small.png" alt="logo" /><div class="headlinks"><a href="Table_of_contents.html">Table of contents</a>
+ &nbsp; <a href="API_documentation.html">API documentation</a>
+</div><div class="navlinks"><a href="index.html" accesskey="t">Top</a> &nbsp; <a href="ItemSelectionModel_class_reference.html"  accesskey="p" id="nav_prev">Previous </a> &nbsp; <a href="API_documentation.html"  accesskey="u" id="nav_up"> Up </a> &nbsp; <a href="ListItem_class_reference.html"  accesskey="n" id="nav_next"> Next</a></div>
+</div><div class="content"><div style="clear: both; height:20px;"></div>
+<h1>Iterator class reference<br /><span class="subtitle">
+[Base module]</span>
+</h1><div class="sec_content1">
+<div style="clear: both; height:20px;"></div>
+<div class="tree_frame" style="width:120px;"><div class="tree_row"><div style="width:10px;" class="tree_pad"></div><div style="width:100px;" class="tree_public"><a href="UserData_class_reference.html">UserData</a></div
+></div><br/><div style="width:60px;" class="tree_connect_1">&nbsp;</div
+><div style="width:60px;" class="tree_connect_4">&nbsp;</div><br/><div style="width:60px;" class="tree_connect_1">&nbsp;</div
+><div style="width:60px;" class="tree_connect_4">&nbsp;</div><br/><div class="tree_row"><div style="width:10px;" class="tree_pad"></div><div style="width:100px;" class="tree_this"><a href="Iterator_class_reference.html">Iterator</a></div
+></div><br/></div>
+</div><h2>Declaration<a href="#_Declaration8" id="_Declaration8" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+<div class="codebox"><code><span class="codedir">#include</span> &lt;QtLua/Iterator&gt;<br /><br /><span class="codekw">namespace</span> QtLua {<br />  <span class="codekw">class</span> Iterator;<br />};<br /></code></div><p> This class is a member of the <a href="QtLua_namespace_reference.html">QtLua</a> namespace.</p>
+<p>This abstract class contains pure virtuals.</p>
+</div><h2>Description<a href="#_Description9" id="_Description9" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+<p>This abstract class can be subclassed to implement iterators to iterate over user defined objects from both lua and C++ code.</p>
+<p><a href="UserData_class_reference.html">UserData</a> based classes can reimplement the UserData::<a href="UserData_class_reference.html#__439">new_iterator</a> function to return a <a href="Ref_class_reference.html">Ref</a> pointer to an <a href="Iterator_class_reference.html">Iterator</a> based class. This allow iteration over user defined objects.</p>
+<p>Some <a href="Iterator_class_reference.html">Iterator</a> based classes are already defined internally in QtLua library for iteration over lua tables and other table like <a href="UserData_class_reference.html">UserData</a> based objects.</p>
+<p><a href="Iterator_class_reference.html">Iterator</a> based classes are used by Value::<a href="Value_iterator_struct_reference.html">iterator</a> and Value::<a href="Value_const_iterator_struct_reference.html">const_iterator</a> classes, this allow iteration on lua tables and <a href="UserData_class_reference.html">UserData</a> based objects from C++:</p>
+<div class="codebox"><code><span class="codecmt">// code from <a href="http://svn.savannah.gnu.org/viewvc/trunk/libqtlua/examples/cpp/value/iterate.cc?root=libqtlua&revision=0&view=annotate#l32">examples/cpp/value/iterate.cc:32</a></span><br /><br />    <a class="coderef" href="State_class_reference.html">QtLua::State</a> state;<br /><br />    <span class="codecmt">// New lua table value</span><br />    state.exec_statements(<span class="codestr">&quot;table = { a = 1, b = 2, c = 3 }&quot;</span>);<br /><br />    <a class="coderef" href="Value_class_reference.html">QtLua::Value</a> table = state[<span class="codestr">&quot;table&quot;</span>];<br /><br />    <span class="codecmt">// Iterate over lua table from C++ code</span><br />    <span class="codekw">for</span> (<a class="coderef" href="Value_const_iterator_struct_reference.html">QtLua::Value::const_iterator</a> i = table.begin(); i != table.end(); i++)<br />      qDebug() &lt;&lt; i.key().to_string_p()<br />               &lt;&lt; i.value().to_string_p();<br /></code></div><p> Non const iterator can be used to modify a lua table as well:</p>
+<div class="codebox"><code><span class="codecmt">// code from <a href="http://svn.savannah.gnu.org/viewvc/trunk/libqtlua/examples/cpp/value/iterate.cc?root=libqtlua&revision=0&view=annotate#l53">examples/cpp/value/iterate.cc:53</a></span><br /><br />    <span class="codecmt">// Modify lua table from C++ code</span><br />    <span class="codekw">for</span> (<a class="coderef" href="Value_iterator_struct_reference.html">QtLua::Value::iterator</a> i = table.begin(); i != table.end(); i++)<br />      i.value() = <a class="coderef" href="Value_class_reference.html">QtLua::Value</a>(state, <span class="codestr">&quot;foo&quot;</span>);<br /></code></div><p> The <a href="QtLua_namespace_reference.html#__725">QtLuaLib</a> lua library provides an <span class="tt">each()</span> lua function which returns a suitable <a href="Iterator_class_reference.html">Iterator</a> to iterate over any <a href="UserData_class_reference.html">UserData</a> based object or lua table:</p>
+<div class="codebox"><code><span class="codecmt">// code from <a href="http://svn.savannah.gnu.org/viewvc/trunk/libqtlua/examples/cpp/value/iterate.cc?root=libqtlua&revision=0&view=annotate#l46">examples/cpp/value/iterate.cc:46</a></span><br /><br />    state.openlib(<a class="coderef" href="QtLua_namespace_reference.html#__725">QtLua::QtLuaLib</a>);<br /><br />    <span class="codecmt">// Iterate from lua code</span><br />    state.exec_statements(<span class="codestr">&quot;for key, value in each(table) do print(key, value) end&quot;</span>);<br /></code></div></div><h2>Members<a href="#_Members8" id="_Members8" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+</div><h3>Inherited members<a href="#_Inherited_members5" id="_Inherited_members5" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li>20 members inherited from <a href="UserData_class_reference.html">UserData</a></li>
+</ul>
+</div><h3>Types<a href="#_Types5" id="_Types5" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li><span class="listitem"><span class="member_prefix">typedef <em> [...] </em> </span><span class="member_signature"><span class="member_name"><a href="Iterator_class_reference.html#__136">const_ptr</a></span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">typedef <em> [...] </em> </span><span class="member_signature"><span class="member_name"><a href="Iterator_class_reference.html#__142">ptr</a></span></span></span></li>
+</ul>
+</div><h3>Functions<a href="#_Functions8" id="_Functions8" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li><span class="listitem"><span class="member_prefix">virtual Value </span><span class="member_signature"><span class="member_name"><a href="Iterator_class_reference.html#__137">get_key</a></span>(<span class="member_params">) const = 0;</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">virtual Value </span><span class="member_signature"><span class="member_name"><a href="Iterator_class_reference.html#__138">get_value</a></span>(<span class="member_params">) const = 0;</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">virtual ValueRef </span><span class="member_signature"><span class="member_name"><a href="Iterator_class_reference.html#__139">get_value_ref</a></span>(<span class="member_params">) = 0;</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">virtual bool </span><span class="member_signature"><span class="member_name"><a href="Iterator_class_reference.html#__140">more</a></span>(<span class="member_params">) const = 0;</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">virtual void </span><span class="member_signature"><span class="member_name"><a href="Iterator_class_reference.html#__141">next</a></span>(<span class="member_params">) = 0;</span></span></span></li>
+</ul>
+</div><h2>Members detail<a href="#_Members_detail8" id="_Members_detail8" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+</div><div class="divmember public_member"><h3><span class="member_prefix">typedef <a href="Ref_class_reference.html">Ref</a>&lt;const <a href="Iterator_class_reference.html">Iterator</a>, <a href="Iterator_class_reference.html">Iterator</a>&gt; </span><span class="member_signature"><span class="member_name">const_ptr</span></span><a href="#__136" id="__136" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Shortcut for <a href="Ref_class_reference.html">Ref</a> smart pointer class to Iterator type provided for convenience</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">virtual <a href="Value_class_reference.html">Value</a> </span><span class="member_signature"><span class="member_name">get_key</span>(<span class="member_params">) const = 0;</span></span><a href="#__137" id="__137" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>The return value is current entry key</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">virtual <a href="Value_class_reference.html">Value</a> </span><span class="member_signature"><span class="member_name">get_value</span>(<span class="member_params">) const = 0;</span></span><a href="#__138" id="__138" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>The return value is current entry value</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">virtual <a href="ValueRef_class_reference.html">ValueRef</a> </span><span class="member_signature"><span class="member_name">get_value_ref</span>(<span class="member_params">) = 0;</span></span><a href="#__139" id="__139" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>The return value is reference to current entry value</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">virtual bool </span><span class="member_signature"><span class="member_name">more</span>(<span class="member_params">) const = 0;</span></span><a href="#__140" id="__140" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>The return value is true if more entries are available.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">virtual void </span><span class="member_signature"><span class="member_name">next</span>(<span class="member_params">) = 0;</span></span><a href="#__141" id="__141" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Jump to next entry.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">typedef <a href="Ref_class_reference.html">Ref</a>&lt;<a href="Iterator_class_reference.html">Iterator</a>, <a href="Iterator_class_reference.html">Iterator</a>&gt; </span><span class="member_signature"><span class="member_name">ptr</span></span><a href="#__142" id="__142" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Shortcut for <a href="Ref_class_reference.html">Ref</a> smart pointer class to Iterator type provided for convenience</p>
+</div></div></div><div class="foot"><p class="generated"><a style="float: right;" href="http://validator.w3.org/check?uri=referer">Valid XHTML 1.0 Strict</a>Generated by diaxen on Sun Jan  8 22:46:02 2012 using <a href="http://www.nongnu.org/mkdoc/">MkDoc</a></p></div></body></html>

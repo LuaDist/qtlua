@@ -20,7 +20,8 @@ test_item_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS) -I$(top_srcdir)/src
 test_item_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags)
 test_item_LDADD   = $(QT_LIBS) $(LDADD) $(top_builddir)/src/libqtlua.la
 
-test_qobject_arg_SOURCES = test_qobject_arg.cc test_qobject_arg.hh test_qobject_arg.moc.cc test.hh
+test_qobject_arg_SOURCES = test_qobject_arg.cc test_qobject_arg.hh test.hh
+nodist_test_qobject_arg_SOURCES = test_qobject_arg.moc.cc
 test_qobject_arg_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
 test_qobject_arg_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS) -I$(top_srcdir)/src
 test_qobject_arg_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags)

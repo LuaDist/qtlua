@@ -69,6 +69,13 @@ public:
   /** Get number of childs */
   inline int get_child_count() const;
 
+  Value meta_operation(State &ls, Value::Operation op, const Value &a, const Value &b);
+  bool support(Value::Operation c) const;
+  void meta_newindex(State &ls, const Value &key, const Value &value);
+  Value meta_index(State &ls, const Value &key);
+  bool meta_contains(State &ls, const Value &key);
+  Iterator::ptr new_iterator(State &ls);
+
 protected:
 
   /**
@@ -78,14 +85,12 @@ protected:
    * @return true if item is allowed to be a child member.
    */
   virtual bool accept_child(const Item::ptr &item) const;
-  virtual Value meta_operation(State &ls, Value::Operation op, const Value &a, const Value &b);
-  virtual bool support(Value::Operation c) const;
+
+  /** Must return columns count for children of this node, default implementation returns 1. */
+  virtual int get_column_count() const;
 
 private:
 
-  void meta_newindex(State &ls, const Value &key, const Value &value);
-  Value meta_index(State &ls, const Value &key);
-  Iterator::ptr new_iterator(State &ls);
   void completion_patch(String &path, String &entry, int &offset);
 
   void set_model(ItemModel* model);

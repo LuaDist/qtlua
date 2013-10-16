@@ -22,6 +22,14 @@
 #ifndef QTLUAREF_HH_
 #define QTLUAREF_HH_
 
+#include <QtGlobal> // for Q_UNUSED
+
+#if QT_VERSION >= 0x040400
+# include <QAtomicInt>
+#else
+# warning QAtomicInt is not available before Qt4.4, QtLua::Ref will not be thread-safe
+#endif
+
 #include <cassert>
 
 namespace QtLua {
@@ -29,7 +37,7 @@ namespace QtLua {
 #ifndef QTLUA_NO_DEBUG
 
   /**
-   * @short Guard class, assert allocated RefObj based objects get free'd (internal)
+   * @short Guard class, assert allocated RefObj based objects get free'd
    * @module {Base}
    * @internal
    * @header QtLua/Ref
@@ -292,7 +300,7 @@ namespace QtLua {
     /** Get object Reference count */
     int count() const
     {
-      return _obj ? _obj->_qtlua_Ref_count : 0;
+      return _obj ? (int)_obj->_qtlua_Ref_count : 0;
     }
 
     /** Test if pointed ojects are the same */
@@ -321,7 +329,7 @@ namespace QtLua {
 
 
   /**
-   * @short Referenced objects base class (internal)
+   * @short Referenced objects base class
    * @header QtLua/Ref
    * @module {Base}
    * @internal
@@ -367,15 +375,26 @@ namespace QtLua {
     void _inc() const
     {
       Refobj<X> *y = const_cast<Refobj<X>*>(this);
+#if 0
       y->ref_inc(++y->_qtlua_Ref_count);
+#endif
+#if QT_VERSION >= 0x040400
+      y->_qtlua_Ref_count.fetchAndAddOrdered(1);
+#else
+      ++y->_qtlua_Ref_count;
+#endif
     }
 
     /** @internal */
     void _drop() const
     {
       Refobj<X> *y = const_cast<Refobj<X>*>(this);
-      assert(_qtlua_Ref_count > 0);
+#if QT_VERSION >= 0x040400
+      int count = y->_qtlua_Ref_count.fetchAndAddOrdered(-1) - 1;
+#else
       int count = --y->_qtlua_Ref_count;
+#endif
+      assert(count >= 0);
 
       if (count == 0 && _qtlua_Ref_delete)
 	{
@@ -389,13 +408,17 @@ namespace QtLua {
       y->ref_drop(count);
     }
 
-    /** This function is called when reference count has just increased.
+#if 0
+    /* This function is called when reference count has just increased.
 
 	@param Count new reference count.
     */
+
     virtual void ref_inc(int count)
     {
+      Q_UNUSED(count);
     }
+#endif
 
     /** This functions is called when reference count has just decreased.
 
@@ -403,6 +426,7 @@ namespace QtLua {
     */
     virtual void ref_drop(int count)
     {
+      Q_UNUSED(count);
     }
 
     /** Get object current reference count */
@@ -414,8 +438,13 @@ namespace QtLua {
     /** @internal */
     typedef X _qtlua_Ref_base_type;
 
+#if QT_VERSION >= 0x040400
+    /** @internal Reference counter value */
+    QAtomicInt _qtlua_Ref_count;
+#else
     /** @internal Reference counter value */
     int _qtlua_Ref_count;
+#endif
 
     /** @internal delete object pointer when refcount reach zero */
     bool _qtlua_Ref_delete;

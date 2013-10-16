@@ -43,7 +43,7 @@ namespace QtLua {
   }
 
   String::String(const QString &s)
-    : QByteArray(s.toAscii())
+    : QByteArray(s.toUtf8())
   {
   }
 
@@ -67,9 +67,14 @@ namespace QtLua {
     return *this;
   }
 
-  String::operator const char * ()
+  String::operator const char * () const
   {
     return constData();
+  }
+
+  QString String::to_qstring () const
+  {
+    return QString::fromUtf8(constData(), size());
   }
 
 }

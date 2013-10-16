@@ -71,6 +71,18 @@ namespace QtLua {
   }
 
   template <class Container>
+  bool QListProxyRo<Container>::meta_contains(State &ls, const Value &key)
+  {
+    try {
+      int index = (unsigned int)key.to_number() - 1;
+
+      return index >= 0 && index < _list->size();
+    } catch (String &e) {
+      return false;
+    }
+  }
+
+  template <class Container>
   Value QListProxyRo<Container>::meta_operation(State &ls, Value::Operation op, const Value &a, const Value &b)
   {
     switch (op)
@@ -116,6 +128,12 @@ namespace QtLua {
   }
 
   template <class Container>
+  String QListProxyRo<Container>::get_type_name() const
+  {
+    return type_name<Container>();
+  }
+
+  template <class Container>
   void QListProxy<Container>::meta_newindex(State &ls, const Value &key, const Value &value)
   {
     if (!_list)
@@ -146,15 +164,15 @@ namespace QtLua {
     if (!_list)
       throw String("Can not iterate on null container.");
 
-    return QTLUA_REFNEW(ProxyIterator, ls, *this);
+    return QTLUA_REFNEW(ProxyIterator, &ls, *this);
   }
 
   template <class Container>
-  QListProxyRo<Container>::ProxyIterator::ProxyIterator(State &ls, const Ref<QListProxyRo> &proxy)
+  QListProxyRo<Container>::ProxyIterator::ProxyIterator(State *ls, const Ref<QListProxyRo> &proxy)
     : _ls(ls),
       _proxy(proxy),
       _it(_proxy->_list->begin()),
-      _i(0)
+      _i(1)
   {
   }
 

@@ -1,11 +1,13 @@
 
-AC_INIT(libqtlua, 1.2)
-PACKAGE_VERSION=1.2
+AC_INIT(libqtlua, 1.4)
+PACKAGE_VERSION=1.4
+LIBRARY_VERSION=1.4
 AC_SUBST(PACKAGE_VERSION)
+AC_SUBST(LIBRARY_VERSION)
 
 AC_CONFIG_AUX_DIR([build])
 
-AM_INIT_AUTOMAKE(libqtlua, 1.2)
+AM_INIT_AUTOMAKE(libqtlua, 1.4)
 AC_CONFIG_HEADERS(config.hh)
 
 AC_PROG_CXX
@@ -33,6 +35,7 @@ AC_CONFIG_FILES([
     examples/cpp/mvc/Makefile
     examples/cpp/value/Makefile
     examples/cpp/plugin/Makefile
+    examples/cpp/types/Makefile
     test/Makefile
     doc/Makefile
 ])
@@ -54,6 +57,7 @@ AC_CHECK_HEADER(lualib.h, , AC_MSG_ERROR([can not find lualib.h; try --with-lua*
 AC_CHECK_HEADER(lauxlib.h, , AC_MSG_ERROR([can not find lauxlib.h; try --with-lua* arguments]))
 
 AC_CHECK_LIB(m, cosf, , AC_MSG_ERROR([can not find m library]))
+AC_CHECK_LIB(dl, dlopen, , )
 AC_CHECK_LIB($luaname, lua_pushnil, , AC_MSG_ERROR([can not find $luaname library; try --with-lua* arguments]))
 AC_CHECK_LIB($luaname, lua_gc, AC_DEFINE(HAVE_LUA_GC, 1, [lua_gc function is available]))
 
@@ -63,7 +67,7 @@ AC_CHECK_LIB($lualibname, luaopen_package, AC_DEFINE(HAVE_LUA_PACKAGELIB, 1, [lu
 AC_CHECK_LIB($lualibname, luaopen_os, AC_DEFINE(HAVE_LUA_OSLIB, 1, [lua os library is available]))
 AC_CHECK_LIB($lualibname, luaL_openlibs, AC_DEFINE(HAVE_LUA_OPENLIBS, 1, [lua os library is available]))
 
-CXXFLAGS="$CPPFLAGS -Wall -Wno-unused-parameter -DQTLUAREF_DEBUG "
+CXXFLAGS="$CPPFLAGS -Wall -Wno-unused-parameter -DQTLUAREF_DEBUG -DQT_NO_CAST_FROM_BYTEARRAY"
 
 eval shared_ext=\"$shrext_cmds\"
 AC_DEFINE_UNQUOTED(SHLIBEXT, $shared_ext, [suffix for dynamic libraries is $shared_ext])

@@ -23,6 +23,7 @@
 #define QTLUA_TABLEGRIDMODEL_HH_
 
 #include <QAbstractItemModel>
+#include <QPointer>
 
 #include <QtLua/Value>
 #include <QtLua/ValueRef>
@@ -41,7 +42,7 @@ namespace QtLua {
    * matches an entry in the provided lua table, and each column
    * describe keys used to access nested tables.
    *
-   * Columns and row keys can be independently handled as numerical
+   * Column and row keys can be independently handled as numerical
    * indexes or as plain lua value. When in numerical key mode, all
    * keys are assumed to be numbers, first key is 1 and keys order is
    * preserved when inserting or deleting entries.
@@ -68,7 +69,7 @@ namespace QtLua {
    * Usage example:
    * @example examples/cpp/mvc/tablegridview.cc:1
    *
-   * @image doc/qtlua_tablegridmodel.png
+   * @image qtlua_tablegridmodel.png
    *
    * @see TableDialog
    */
@@ -81,14 +82,14 @@ namespace QtLua {
 
   public:
 
-    /** Specifies @ref TableGridModel behavior for a given lua table */
+    /** Specifies @ref TableGridModel behavior for a given lua table @showvalue */
     enum Attribute
       {
 	NumKeysCols   = 0x00000001,	//< Columns use numeric keys
 	NumKeysRows   = 0x00000002,	//< Rows use numeric keys
 	RowColSwap    = 0x00000004,	//< Swap rows and columns in views
 	UnquoteHeader = 0x00000008,	//< Strip double quote from string keys
-	UnquoteValues = 0x00000010,	//< Strip double quote from string keys
+	UnquoteValues = 0x00000010,	//< Strip double quote from string values
 
 	Editable      = 0x00001000,	//< Allow editing exposed tables using views.
 	EditFixedType = 0x00002000,	//< Prevent value type change when editing.
@@ -171,6 +172,8 @@ namespace QtLua {
     /** */
 
   private:
+    void check_state() const;
+
     int row_count() const;
     int column_count() const;
     bool remove_rows(int row, int count, const QModelIndex &parent);
@@ -180,7 +183,7 @@ namespace QtLua {
 
     bool set_value_ref(const ValueRef &ref, const QByteArray &input);
 
-    State &_st;
+    QPointer<State> _st;
     Attributes _attr;
     Value _table;
     QList<Value> _row_keys;

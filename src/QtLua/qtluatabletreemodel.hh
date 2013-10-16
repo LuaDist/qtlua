@@ -22,8 +22,10 @@
 #ifndef QTLUA_TABLETREEMODEL_HH_
 #define QTLUA_TABLETREEMODEL_HH_
 
-#include <QtLua/Value>
 #include <QAbstractItemModel>
+#include <QPointer>
+
+#include <QtLua/Value>
 
 namespace QtLua {
 
@@ -53,7 +55,7 @@ namespace QtLua {
    * Usage example:
    * @example examples/cpp/mvc/tabletreeview.cc:1
    *
-   * @image doc/qtlua_tabletreemodel.png
+   * @image qtlua_tabletreemodel.png
    *
    * @see TableDialog
    */
@@ -66,16 +68,16 @@ namespace QtLua {
 
   public:
 
-    /** Specifies @ref TableTreeModel behavior for a given lua table */
+    /** Specifies @ref TableTreeModel behavior for a given lua table @showvalue */
     enum Attribute
       {
 	Recursive	= 0x00000001,	//< Expose nested tables too.
 	UserDataIter	= 0x00000002,	//< Iterate over UserData objects too.
 	HideType	= 0x00000004,	//< Do not show entry type in an additionnal column.
-	UnquoteKeys	= 0x00000008,	//< Strip double quote from string keys
-	UnquoteValues	= 0x00000010,	//< Strip double quote from string keys
+	UnquoteKeys	= 0x00000008,	//< Strip double quotes from string keys
+	UnquoteValues	= 0x00000010,	//< Strip double quotes from string values
 
-	Editable	= 0x00001000,	//< Allow editing exposed tables using views.
+	Editable	= 0x00001000,	//< Allow editing exposed lua tables.
 	EditFixedType	= 0x00002000,	//< Prevent value type change when editing.
 	EditLuaEval	= 0x00004000,	//< Evaluate user input as a lua expression.
 	EditInsert	= 0x00008000,	//< Allow insertion of new entries.
@@ -124,9 +126,10 @@ namespace QtLua {
 
   private:
 
+    void check_state() const;
     TableTreeKeys * table_from_index(const QModelIndex &index) const;
 
-    State &_st;
+    QPointer<State> _st;
     TableTreeKeys *_table;
   };
 

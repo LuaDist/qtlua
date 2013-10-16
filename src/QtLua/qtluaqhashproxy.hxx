@@ -71,6 +71,12 @@ namespace QtLua {
   }
 
   template <class Container>
+  bool QHashProxyRo<Container>::meta_contains(State &ls, const Value &key)
+  {
+    return _hash->contains(key);
+  }
+
+  template <class Container>
   Value QHashProxyRo<Container>::meta_operation(State &ls, Value::Operation op, const Value &a, const Value &b)
   {
     switch (op)
@@ -133,11 +139,11 @@ namespace QtLua {
     if (!_hash)
       throw String("Can not iterate on null container.");
 
-    return QTLUA_REFNEW(ProxyIterator, ls, *this);
+    return QTLUA_REFNEW(ProxyIterator, &ls, *this);
   }
 
   template <class Container>
-  QHashProxyRo<Container>::ProxyIterator::ProxyIterator(State &ls, const Ref<QHashProxyRo> &proxy)
+  QHashProxyRo<Container>::ProxyIterator::ProxyIterator(State *ls, const Ref<QHashProxyRo> &proxy)
     : _ls(ls),
       _proxy(proxy),
       _it(_proxy->_hash->begin())
@@ -174,11 +180,28 @@ namespace QtLua {
     return ValueRef(Value(_ls, _proxy), Value(_ls, _it.key()));
   }
 
-  template <class Container>
-  void QHashProxyRo<Container>::completion_patch(String &path, String &entry, int &offset)
+  template <typename T>
+  void QHashProxyKeytype<T>::completion_patch(String &path, String &entry, int &offset)
   {
     entry += "[]";
     offset--;
+  }
+
+  void QHashProxyKeytype<String>::completion_patch(String &path, String &entry, int &offset)
+  {
+    entry += ".";
+  }
+
+  template <class Container>
+  void QHashProxyRo<Container>::completion_patch(String &path, String &entry, int &offset)
+  {
+    QHashProxyKeytype<typename Container::key_type>::completion_patch(path, entry, offset);
+  }
+
+  template <class Container>
+  String QHashProxyRo<Container>::get_type_name() const
+  {
+    return type_name<Container>();
   }
 
 }

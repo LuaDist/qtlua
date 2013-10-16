@@ -121,6 +121,12 @@ void Item::set_name(const String &name)
     emit _model->dataChanged(model_index(), model_index());
 }
 
+void Item::data_changed(int column) const
+{
+  if (_model)
+    emit _model->dataChanged(model_index(column), model_index(column));  
+}
+
 Item * Item::get_child_row(int row) const
 {
   return 0;
@@ -156,6 +162,21 @@ QIcon &	Item::get_icon() const
   static QIcon i = QIcon();
 
   return i;
+}
+
+bool Item::set_data(int column, int role)
+{
+  return false;
+}
+
+QVariant Item::get_data(int column, int role) const
+{
+  return QVariant();
+}
+
+Qt::ItemFlags Item::get_flags(int column) const
+{
+  return Qt::ItemIsEnabled;
 }
 
 }

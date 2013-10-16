@@ -30,7 +30,7 @@
 namespace QtLua {
 
 /**
- * @short Qt enum wrapper class (internal)
+ * @short Qt enum wrapper class
  * @header internal/Enum
  * @module {QObject wrapping}
  * @internal

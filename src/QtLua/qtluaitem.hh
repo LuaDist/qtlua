@@ -100,6 +100,18 @@ public:
 
 protected:
 
+  /** Make model emit QAbstractItemModel::dataChanged signal for this item */
+  void data_changed(int column = 0) const;
+
+  /** May be reimplemented for @tt column > 0, see QAbstractItemModel::setData. */
+  virtual bool set_data(int column, int role);
+
+  /** May be reimplemented for @tt column > 0, see QAbstractItemModel::data. */
+  virtual QVariant get_data(int column, int role) const;
+
+  /** May be reimplemented for @tt column > 0, see QAbstractItemModel::flags. */
+  virtual Qt::ItemFlags get_flags(int column) const;
+
   /** Must return icon decoration to use for this node. */
   virtual QIcon & get_icon() const;
 
@@ -119,6 +131,9 @@ protected:
       other item (default is is_remove_allowed()) */
   virtual bool is_replace_allowed() const;
 
+  /** Get child position in parent item */
+  inline int get_row() const;
+
 private:
   const Item &operator=(const Item &);
 
@@ -126,8 +141,7 @@ private:
   inline ItemModel * get_model() const;
   bool in_parent_path(Item *item);
   void insert_name();
-  inline QModelIndex model_index() const;
-  inline int get_row() const;
+  inline QModelIndex model_index(int column = 0) const;
   inline void set_row(int row);
   virtual Item * get_child_row(int row) const;
   virtual int get_child_count() const;

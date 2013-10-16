@@ -89,6 +89,46 @@ void Console::set_history(const QStringList &h)
   _history.append("");
 }
 
+void Console::load_history(QSettings &settings, const QString &key)
+{
+  int size = settings.beginReadArray(key);
+
+  if (size > 0)
+    {
+      _history.clear();
+
+      for (int i = 0; i < size; ++i)
+	{
+	  settings.setArrayIndex(i);
+	  _history.append(settings.value("line").toString());
+	}
+
+      _history_ndx = _history.size();
+      _history.append("");
+    }
+
+  settings.endArray();
+}
+
+void Console::save_history(QSettings &settings, const QString &key) const
+{
+  settings.beginWriteArray(key);
+
+  int i, j;
+  for (i = j = 0; i < _history.size(); i++)
+    {
+      const QString & line = _history.at(i);
+
+      if (line.trimmed().isEmpty())
+	continue;
+
+      settings.setArrayIndex(j++);
+      settings.setValue("line", _history.at(i));
+    }
+
+  settings.endArray();
+}
+
 void Console::action_history_up()
 {
   if (_history_ndx == 0)
@@ -239,6 +279,7 @@ void Console::action_key_complete()
 
       // print list
 
+      setUndoRedoEnabled(false);
       // clear previous completion list text
       QTextCursor tc = textCursor();
       int offset = tc.position() - _line_start;
@@ -262,6 +303,7 @@ void Console::action_key_complete()
       _prompt_start = tc.position();
       tc.setPosition(_line_start + offset, QTextCursor::MoveAnchor);
       setTextCursor(tc);
+      setUndoRedoEnabled(true);
     }
     }
 }
@@ -327,6 +369,8 @@ int Console::get_history_size() const
 
 void Console::action_key_enter()
 {
+  setUndoRedoEnabled(false);
+
   QTextCursor	tc = textCursor();
 
   // select function line
@@ -370,6 +414,8 @@ void Console::action_key_enter()
 
   if (!line.trimmed().isEmpty())
     emit line_validate(line);
+
+  setUndoRedoEnabled(true);
 }
 
 void Console::action_home()
@@ -394,6 +440,7 @@ void Console::delete_completion_list()
     {
       QTextCursor	tc = textCursor();
 
+      setUndoRedoEnabled(false);
       tc.setPosition(_complete_start, QTextCursor::MoveAnchor);
       tc.setPosition(_prompt_start, QTextCursor::KeepAnchor);
       tc.removeSelectedText();
@@ -401,6 +448,7 @@ void Console::delete_completion_list()
       _line_start += tc.position() - _prompt_start;
       _mark += tc.position() - _prompt_start;
       _prompt_start = tc.position();
+      setUndoRedoEnabled(true);
     }
 }
 
@@ -642,7 +690,9 @@ void Console::print(const QString &str)
 {
   int first = 0;
   int last;
-  QRegExp rx("\\0033\\[(\\d*)m");
+  static QRegExp rx("\\0033\\[(\\d*)m");
+
+  setUndoRedoEnabled(false);
 
   // go before prompt and completion list
   QTextCursor tc = textCursor();
@@ -673,6 +723,8 @@ void Console::print(const QString &str)
   _prompt_start += len;
   tc.setPosition(cur + len, QTextCursor::MoveAnchor);
   setTextCursor(tc);
+
+  setUndoRedoEnabled(true);
 }
 
 QSize Console::sizeHint() const

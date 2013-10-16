@@ -27,10 +27,11 @@
 
 namespace QtLua {
 
+  /** @internal */
   extern const QMetaObject *meta_object_table[];
 
 /**
- * @short QMetaObject wrapper class (internal)
+ * @short QMetaObject wrapper class
  * @header internal/QMetaObjectWrapper
  * @module {QObject wrapping}
  * @internal

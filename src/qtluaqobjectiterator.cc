@@ -30,7 +30,7 @@
 namespace QtLua {
 
   QObjectIterator::QObjectIterator(State &ls, const QMetaObject *mo)
-    : _ls(ls)
+    : _ls(&ls)
   {
     _cur = CurMember;
     _mc = &MetaCache::get_meta(mo);
@@ -40,7 +40,7 @@ namespace QtLua {
   }
 
   QObjectIterator::QObjectIterator(State &ls, const QObjectWrapper::ptr &qow)
-    : _ls(ls),
+    : _ls(&ls),
       _qow(qow)
   {
     _cur = CurChildren;
@@ -111,7 +111,7 @@ namespace QtLua {
     switch (_cur)
       {
       case CurChildren:
-	if (!_qow->_obj)
+	if (!_ls || !_qow->_obj)
 	  return Value(_ls);
 	else
 	  return Value(_ls, QObjectWrapper::qobject_name(*_qow->_obj->children().at(_child_id)));
@@ -129,10 +129,10 @@ namespace QtLua {
     switch (_cur)
       {
       case CurChildren:
-	if (!_qow->_obj)
+	if (!_ls || !_qow->_obj)
 	  return Value(_ls);
 	else
-	  return Value(_ls, QObjectWrapper::get_wrapper(_ls, _qow->_obj->children().at(_child_id)));
+	  return Value(_ls, QObjectWrapper::get_wrapper(*_ls, _qow->_obj->children().at(_child_id)));
 
       case CurMember:
 	return Value(_ls, _it.value());
@@ -146,6 +146,7 @@ namespace QtLua {
   {
     // Not used from lua script
     std::abort();
+    return ValueRef(Value(), Value());
   }
 
 }

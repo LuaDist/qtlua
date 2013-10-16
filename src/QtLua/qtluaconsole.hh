@@ -25,6 +25,8 @@
 #include <QTextEdit>
 #include <QTextCursor>
 #include <QMouseEvent>
+#include <QPointer>
+#include <QSettings>
 
 namespace QtLua {
 
@@ -38,6 +40,8 @@ namespace QtLua {
    *
    * This widget is a general purpose console widget with history and
    * completion capabilities.
+   *
+   * @xref{The qtlua interpreter tool} uses this widget.
    *
    * When used with a @ref QtLua::State lua interpreter object, it
    * only needs a few signals connections to get a working lua based
@@ -82,8 +86,16 @@ public:
   /** Get current history. */
   inline const QStringList & get_history() const;
 
-  /** Get current history. */
+  /** Set current history. */
   void set_history(const QStringList &h);
+
+  /** Load history from @ref QSettings object and keep a @ref QPointer
+      to QSettings for subsequent call to the @ref save_history function. */
+  void load_history(QSettings &s, const QString &key = "qtlua_console_history");
+
+  /** Save history using @ref QSettings object previously passed to
+      @ref load_history function. */
+  void save_history(QSettings &s, const QString &key = "qtlua_console_history") const;
 
   /** Set Qt regular expression used to extract text before cursor to
     * pass to completion signal.

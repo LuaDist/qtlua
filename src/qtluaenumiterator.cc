@@ -28,7 +28,7 @@
 namespace QtLua {
 
   EnumIterator::EnumIterator(State &ls, QMetaEnum me)
-    : _ls(ls),
+    : _ls(&ls),
       _me(me),
       _index(0)
   {
@@ -57,7 +57,8 @@ namespace QtLua {
 
   ValueRef EnumIterator::get_value_ref()
   {
-    abort();
+    std::abort();
+    return ValueRef(Value(), Value());
   }
 
 }

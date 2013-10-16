@@ -26,7 +26,7 @@
 #include <QAbstractItemView>
 #include <QMimeData>
 
-#include "qtluaitem.hh"
+#include "qtlualistitem.hh"
 
 namespace QtLua {
 
@@ -49,7 +49,7 @@ class State;
    * Usage example:
    * @example examples/cpp/mvc/itemtreeview.cc:1
    *
-   * @image doc/qtlua_itemmodel.png
+   * @image qtlua_itemmodel.png
    */
 
 class ItemModel : public QAbstractItemModel
@@ -61,7 +61,7 @@ class ItemModel : public QAbstractItemModel
 
 public:
   /** Create a new item model with pointer to root item */
-  ItemModel(Item::ptr root, QObject *parent = 0);
+  ItemModel(ListItem::ptr root, QObject *parent = 0);
 
   ~ItemModel();
 
@@ -102,7 +102,7 @@ private:
     QList<Item::ptr> _itemlist;
   };
 
-  Item::ptr _root;
+  ListItem::ptr _root;
 };
 
 }

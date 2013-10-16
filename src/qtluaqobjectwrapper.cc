@@ -52,7 +52,7 @@ namespace QtLua {
 	assert_do(QMetaObject::connect(obj, destroyindex, this, metaObject()->methodCount() + 0));
 
 	ls._whash.insert(obj, this);
-	// increment reference count since we are binded to a qobject
+	// increment reference count since we are bound to a qobject
 	_inc();
       }
   }
@@ -161,7 +161,7 @@ namespace QtLua {
       lua_args.push_back(Value(_ls));
 
     // push more args from parameter type informations
-    QMetaMethod mm = _obj->metaObject()->method(id >> 16);
+    QMetaMethod mm = _obj->metaObject()->method(i.value()._sigindex);
 
     foreach(const QByteArray &pt, mm.parameterTypes())
       {
@@ -170,7 +170,7 @@ namespace QtLua {
       }
 
     try {
-      i.value().call(lua_args);
+      i.value()._value.call(lua_args);
     } catch (const String &err) {
       qDebug() << "Error executing lua slot:" << err;
     }
@@ -184,12 +184,15 @@ namespace QtLua {
       {
       case Value::TUserData:
       case Value::TFunction: {
-	int slot_id = _lua_next_slot++ | (sigindex << 16);
+	int slot_id;
 
-	if (_lua_next_slot <= 65536 &&
-	    QMetaObject::connect(_obj, sigindex, this, metaObject()->methodCount() + slot_id))
+	do {
+	  slot_id = _lua_next_slot++;
+	} while (_lua_slots.contains(slot_id));
+
+	if (QMetaObject::connect(_obj, sigindex, this, metaObject()->methodCount() + slot_id))
 	  {
-	    _lua_slots.insert(slot_id, value);
+	    _lua_slots.insert(slot_id, LuaSlot(value, sigindex));
 	    return;
 	  }
 
@@ -207,10 +210,11 @@ namespace QtLua {
 
     for (i = _lua_slots.begin(); i != _lua_slots.end(); )
       {
-	if (((i.key() >> 16) == sigindex) && (value == i.value()))
+	if (i.value()._sigindex == sigindex && value == i.value()._value)
 	  {
 	    bool ok = QMetaObject::disconnect(_obj, sigindex, this, metaObject()->methodCount() + i.key());
 	    assert(ok);
+	    _lua_next_slot = std::min(_lua_next_slot, i.key());
 	    i = _lua_slots.erase(i);
 	    return true;
 	  }
@@ -227,10 +231,11 @@ namespace QtLua {
 
     for (i = _lua_slots.begin(); i != _lua_slots.end(); )
       {
-	if ((i.key() >> 16) == sigindex)
+	if (i.value()._sigindex == sigindex)
 	  {
 	    bool ok = QMetaObject::disconnect(_obj, sigindex, this, metaObject()->methodCount() + i.key());
 	    assert(ok);
+	    _lua_next_slot = std::min(_lua_next_slot, i.key());
 	    i = _lua_slots.erase(i);
 	  }
 	else
@@ -244,11 +249,12 @@ namespace QtLua {
 
     for (i = _lua_slots.begin(); i != _lua_slots.end(); )
       {
-	bool ok = QMetaObject::disconnect(_obj, i.key() >> 16, this, metaObject()->methodCount() + i.key());
+	bool ok = QMetaObject::disconnect(_obj, i.value()._sigindex, this, metaObject()->methodCount() + i.key());
 	assert(ok);
 	++i;
       }
     _lua_slots.clear();
+    _lua_next_slot = 1;
   }
 
   QObject * QObjectWrapper::get_child(QObject &obj, const String &name)
@@ -315,7 +321,7 @@ namespace QtLua {
       {
 	QObjectWrapper::ptr qow = value.to_userdata_cast<QObjectWrapper>();
 	QObject &child = qow->get_object();
-	child.setObjectName(skey);
+	child.setObjectName(skey.to_qstring());
 	qow->reparent(&obj);
       }
   }
@@ -340,12 +346,7 @@ namespace QtLua {
 
   String QObjectWrapper::get_type_name() const
   {
-    String res(UserData::get_type_name());
-
-    if (_obj)
-      res += "<" + String(_obj->metaObject()->className()) + ">";
-
-    return res;
+    return _obj->metaObject()->className();
   }
 
   String QObjectWrapper::get_value_str() const

@@ -42,6 +42,7 @@ namespace QtLua {
 
   class UserData;
   class QObjectWrapper;
+  class TableIterator;
 
   /** @internal */
   typedef QHash<QObject *, QObjectWrapper *> wrapper_hash_t;
@@ -89,6 +90,8 @@ class State : public QObject
   friend class UserData;
   friend class Value;
   friend class ValueRef;
+  friend class TableIterator;
+  friend uint qHash(const Value &lv);
 
 public:
 
@@ -213,6 +216,8 @@ signals:
 
 private:
 
+  inline void output_str(const String &str);
+
   // get pointer to lua state object from lua state
   static State *get_this(lua_State *st);
 
@@ -259,7 +264,7 @@ private:
   // QObjects wrappers are referenced here
   wrapper_hash_t _whash;
 
-  lua_State	*_st;
+  lua_State	*_lst;
 };
 
 }

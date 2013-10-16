@@ -15,7 +15,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with LibQtLua.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright (C) 2008, Alexandre Becoulet <alexandre.becoulet@free.fr>
+    Copyright (C) 2008-2011, Alexandre Becoulet <alexandre.becoulet@free.fr>
 
 */
 
@@ -30,11 +30,14 @@
 #include <QWidget>
 
 #include <QtLua/String>
+#include <QtLua/MetaType>
 #include <internal/QObjectWrapper>
 
 #include <internal/Member>
 
 namespace QtLua {
+
+  metatype_map_t types_map;
 
   void Member::assign(QObjectWrapper &obj, const Value &value)
   {
@@ -66,6 +69,8 @@ namespace QtLua {
   {
     switch (type)
       {
+      case QMetaType::Void:
+	return Value(ls);
       case QMetaType::Bool:
 	return Value(ls, (Value::Bool)*(bool*)data);
       case QMetaType::Int:
@@ -158,6 +163,12 @@ namespace QtLua {
       default:
 	if (type == ud_ref_type)
 	  return Value(ls, **(Ref<UserData>*)data);
+
+	metatype_map_t::const_iterator i = types_map.find(type);
+
+	if (i != types_map.end())
+	  return i.value()->qt2lua(ls, data);
+
 	return Value(ls);
       }
   }
@@ -209,13 +220,13 @@ namespace QtLua {
 	*reinterpret_cast<QChar*>(data) = QChar((unsigned short)v.to_number());
 	return true;
       case QMetaType::QString:
-	*reinterpret_cast<QString*>(data) = v.to_string();
+	*reinterpret_cast<QString*>(data) = v.to_qstring();
 	return true;
       case QMetaType::QStringList: {
 	QStringList *qsl = reinterpret_cast<QStringList*>(data);
 	try {
 	  for (int i = 1; ; i++)
-	    qsl->push_back(v[i].to_string());
+	    qsl->push_back(v[i].to_qstring());
 	} catch (String &e) {
 	}
 	return true;
@@ -280,6 +291,12 @@ namespace QtLua {
 	    *reinterpret_cast<Ref<UserData>*>(data) = v.to_userdata();
 	    return true;
 	  }
+
+	metatype_map_t::const_iterator i = types_map.find(type);
+
+	if (i != types_map.end())
+	  return i.value()->lua2qt(data, v);
+
 	return false;
       }
 

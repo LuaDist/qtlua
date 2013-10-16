@@ -10,7 +10,8 @@ BUILT_SOURCES = QtLua/qtluaconsole.moc.cc QtLua/qtluaitemselectionmodel.moc.cc \
 		QtLua/qtluatablegridmodel.moc.cc			\
 		qtluaqtlib.moc.cc
 
-libqtlua_la_SOURCES = $(BUILT_SOURCES) qtluaconsole.cc qtluaenum.cc		\
+nodist_libqtlua_la_SOURCES = $(BUILT_SOURCES)
+libqtlua_la_SOURCES = qtluaconsole.cc qtluaenum.cc				\
 	qtluafunction.cc qtluaitem.cc qtluaitemmodel.cc	qtlualistitem.cc	\
 	qtlualistiterator.cc qtluamember.cc qtluametacache.cc qtluamethod.cc	\
 	qtluaplugin.cc qtluaqobjectwrapper.cc qtluaqtlib.cc qtluastate.cc	\
@@ -18,10 +19,11 @@ libqtlua_la_SOURCES = $(BUILT_SOURCES) qtluaconsole.cc qtluaenum.cc		\
 	qtluavalueref.cc qtluaqobjectiterator.cc qtluaenumiterator.cc		\
 	qtluaproperty.cc qtluaqmetaobjecttable.cc qtluaqmetaobjectwrapper.cc	\
 	qtluaitemselectionmodel.cc qtluaqtlib.hh qtluatabletreekeys.cc		\
-	qtluatabletreemodel.cc qtluatabledialog.cc qtluatablegridmodel.cc
+	qtluatabletreemodel.cc qtluatabledialog.cc qtluatablegridmodel.cc	\
+	qtluadispatchproxy.cc
 
 libqtlua_la_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
 libqtlua_la_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS)
-libqtlua_la_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags) -release $(PACKAGE_VERSION)
+libqtlua_la_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags) -release $(LIBRARY_VERSION)
 libqtlua_la_LIBADD   = $(QT_LIBS) $(LIBADD)
 

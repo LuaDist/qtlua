@@ -31,60 +31,71 @@ namespace QtLua {
 
   void ValueRef::init(const Value &table)
   {
-    lua_pushlightuserdata(_st, this);
+    check_state();
+    lua_State *lst = _st->_lst;
+
+    lua_pushlightuserdata(lst, this);
     table.push_value();
 
-    int t = lua_type(_st, -1);
+    int t = lua_type(lst, -1);
 
     switch (t)
       {
       case TUserData:
       case TTable:
-	lua_rawset(_st, LUA_REGISTRYINDEX);
+	lua_rawset(lst, LUA_REGISTRYINDEX);
 	break;
 
       default:
-	lua_pop(_st, 2);
-	throw String("Can not make value reference with lua::% type as table.").arg(lua_typename(_st, t));
+	lua_pop(lst, 2);
+	throw String("Can not make value reference with lua::% type as table.").arg(lua_typename(lst, t));
       }
   }
 
   ValueRef::ValueRef(const ValueRef &ref)
-    : Value(ref._st),
+    : Value(*ref._st),
       _key(ref._key)
   {
-    lua_pushlightuserdata(_st, this);
-    lua_pushlightuserdata(_st, (void*)&ref);
-    lua_rawget(_st, LUA_REGISTRYINDEX);
-    lua_rawset(_st, LUA_REGISTRYINDEX);
+    if (!_st)
+      return;
+
+    lua_State *lst = _st->_lst;
+
+    lua_pushlightuserdata(lst, this);
+    lua_pushlightuserdata(lst, (void*)&ref);
+    lua_rawget(lst, LUA_REGISTRYINDEX);  
+    lua_rawset(lst, LUA_REGISTRYINDEX);
   }
 
   void ValueRef::push_value() const
   {
-    // get table object
-    lua_pushlightuserdata(_st, (void*)this);
-    lua_rawget(_st, LUA_REGISTRYINDEX);  
+    check_state();
+    lua_State *lst = _st->_lst;
 
-    int t = lua_type(_st, -1);
+    // get table object
+    lua_pushlightuserdata(lst, (void*)this);
+    lua_rawget(lst, LUA_REGISTRYINDEX);  
+
+    int t = lua_type(lst, -1);
 
     switch (t)
       {
       case TUserData:
 	try {
-	  UserData::ptr ud = UserData::get_ud(_st, -1);
-	  ud->meta_index(*State::get_this(_st), _key).push_value();
-	  lua_remove(_st, -2);
+	  UserData::ptr ud = UserData::get_ud(lst, -1);
+	  ud->meta_index(*_st, _key).push_value();
+	  lua_remove(lst, -2);
 
 	} catch (const String &e) {
-	  lua_pop(_st, 1);
-	  lua_pushnil(_st);
+	  lua_pop(lst, 1);
+	  lua_pushnil(lst);
 	}
 	break;
 
       case TTable:
 	_key.push_value();
-	lua_gettable(_st, -2);
-	lua_remove(_st, -2);
+	lua_gettable(lst, -2);
+	lua_remove(lst, -2);
 	break;
 
       default:
@@ -94,28 +105,33 @@ namespace QtLua {
 
   const ValueRef & ValueRef::operator=(const Value &v) const
   {
-    lua_pushlightuserdata(_st, (void*)this);
-    lua_rawget(_st, LUA_REGISTRYINDEX);
+    if (!_st)
+      return *this;
 
-    switch (lua_type(_st, -1))
+    lua_State *lst = _st->_lst;
+
+    lua_pushlightuserdata(lst, (void*)this);
+    lua_rawget(lst, LUA_REGISTRYINDEX);  
+
+    switch (lua_type(lst, -1))
       {
       case TUserData: {
-	UserData::ptr ud = UserData::pop_ud(_st);
-	ud->meta_newindex(*State::get_this(_st), _key, v);
+	UserData::ptr ud = UserData::pop_ud(lst);
+	ud->meta_newindex(*_st, _key, v);
 	break;
       }
 
       case TTable:
 	_key.push_value();
-	if (lua_isnil(_st, -1))
+	if (lua_isnil(lst, -1))
 	  {
-	    lua_pop(_st, 2);
+	    lua_pop(lst, 2);
 	  }
 	else
 	  {
 	    v.push_value();
-	    lua_settable(_st, -3);
-	    lua_pop(_st, 1);
+	    lua_settable(lst, -3);
+	    lua_pop(lst, 1);
 	  }
 	break;
 

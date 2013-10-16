@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ <meta name="Generator" content="MKDOC " />
+ <title>QtLua library manual </title>
+ <link rel="stylesheet" href="mkdoc.css" />
+ <style type="text/css">
+
+  .sec_hidden { display: none; }
+  .sec_shown {}
+ </style>
+</head><body>
+<div class="page"><div class="head"><img class="headlogo" src="logo-small.png" alt="logo" /><div class="headlinks"><a href="Table_of_contents.html">Table of contents</a>
+ &nbsp; <a href="API_documentation.html">API documentation</a>
+</div><div class="navlinks"><a href="index.html" accesskey="t">Top</a> &nbsp; <a href="Value_iterator__internal_class_members.html"  accesskey="p" id="nav_prev">Previous </a> &nbsp; <a href="API_documentation.html"  accesskey="u" id="nav_up"> Up </a> &nbsp; <a href="Enum_internal_class_members.html"  accesskey="n" id="nav_next"> Next</a></div>
+</div><div class="content"><div style="clear: both; height:20px;"></div>
+<h1>ValueRef class reference<br /><span class="subtitle">
+[Base module]</span>
+</h1><div class="sec_content1">
+<div style="clear: both; height:20px;"></div>
+<div class="tree_frame" style="width:120px;"><div class="tree_row"><div style="width:10px;" class="tree_pad"></div><div style="width:100px;" class="tree_public"><a href="Value_class_reference.html">Value</a></div
+></div><br/><div style="width:60px;" class="tree_connect_1">&nbsp;</div
+><div style="width:60px;" class="tree_connect_4">&nbsp;</div><br/><div style="width:60px;" class="tree_connect_1">&nbsp;</div
+><div style="width:60px;" class="tree_connect_4">&nbsp;</div><br/><div class="tree_row"><div style="width:10px;" class="tree_pad"></div><div style="width:100px;" class="tree_this"><a href="ValueRef_class_reference.html">ValueRef</a></div
+></div><br/></div>
+</div><h2>Declaration<a href="#_Declaration32" id="_Declaration32" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+<div class="codebox"><code><span class="codedir">#include</span> &lt;QtLua/ValueRef&gt;<br /><br /><span class="codekw">namespace</span> QtLua {<br />  <span class="codekw">class</span> ValueRef;<br />};<br /></code></div><p> This class is a member of the <a href="QtLua_namespace_reference.html">QtLua</a> namespace.</p>
+</div><h2>Description<a href="#_Description33" id="_Description33" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+<p>This class acts as a reference to a lua value stored in a lua table (or userdata value). It stores two lua values: a table along with a key value.</p>
+<p>This is mainly used in the <a href="State_class_reference.html">State</a>, <a href="Value_class_reference.html">Value</a> and Value::<a href="Value_iterator_struct_reference.html">iterator</a> classes to allow modification of lua tables with the C++ square bracket operator functions.</p>
+</div><h2>Members<a href="#_Members32" id="_Members32" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+</div><h3>Inherited members<a href="#_Inherited_members16" id="_Inherited_members16" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li>157 members inherited from <a href="Value_class_reference.html">Value</a></li>
+</ul>
+</div><h3>Functions<a href="#_Functions31" id="_Functions31" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li><span class="listitem"><span class="member_prefix"></span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__630">ValueRef</a></span>(<span class="member_params"><span class="member_param">const Value &amp;table, </span><span class="member_param">const Value &amp;key</span>)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">template </span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__631">ValueRef</a></span>(<span class="member_params"><span class="member_param">const Value &amp;table, </span><span class="member_param">const T &amp;key</span>)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix"></span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__632">ValueRef</a></span>(<span class="member_params"><span class="member_param">const ValueRef &amp;ref</span>)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">const ValueRef &amp; </span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__633">operator=</a></span>(<span class="member_params"><span class="member_param">const Value &amp;v</span>) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">const ValueRef &amp; </span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__634">operator=</a></span>(<span class="member_params"><span class="member_param">const ValueRef &amp;v</span>) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">const ValueRef &amp; </span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__635">operator=</a></span>(<span class="member_params"><span class="member_param">Value::Bool n</span>) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">const ValueRef &amp; </span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__636">operator=</a></span>(<span class="member_params"><span class="member_param">double n</span>) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">const ValueRef &amp; </span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__637">operator=</a></span>(<span class="member_params"><span class="member_param">int n</span>) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">const ValueRef &amp; </span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__638">operator=</a></span>(<span class="member_params"><span class="member_param">const String &amp;str</span>) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">const ValueRef &amp; </span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__639">operator=</a></span>(<span class="member_params"><span class="member_param">const Ref&lt;UserData&gt; &amp;ud</span>) const</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">const ValueRef &amp; </span><span class="member_signature"><span class="member_name"><a href="ValueRef_class_reference.html#__640">operator=</a></span>(<span class="member_params"><span class="member_param">QObject *obj</span>) const</span></span></span></li>
+</ul>
+</div><h2>Members detail<a href="#_Members_detail32" id="_Members_detail32" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+</div><div class="divmember public_member"><h3><span class="member_prefix"></span><span class="member_signature"><span class="member_name">ValueRef</span>(<span class="member_params"><span class="member_param">const <a href="Value_class_reference.html">Value</a> &amp;table, </span><span class="member_param">const <a href="Value_class_reference.html">Value</a> &amp;key</span>)</span></span><a href="#__630" id="__630" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Construct reference with given table and key.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">template &lt;typename T&gt; </span><span class="member_signature"><span class="member_name">ValueRef</span>(<span class="member_params"><span class="member_param">const <a href="Value_class_reference.html">Value</a> &amp;table, </span><span class="member_param">const T &amp;key</span>)</span></span><a href="#__631" id="__631" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Construct reference with given table and key.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix"></span><span class="member_signature"><span class="member_name">ValueRef</span>(<span class="member_params"><span class="member_param">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp;ref</span>)</span></span><a href="#__632" id="__632" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p><span class="nodoc">No documentation available</span></p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp; </span><span class="member_signature"><span class="member_name">operator=</span>(<span class="member_params"><span class="member_param">const <a href="Value_class_reference.html">Value</a> &amp;v</span>) const</span></span><a href="#__633" id="__633" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Assign new value to referenced value.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp; </span><span class="member_signature"><span class="member_name">operator=</span>(<span class="member_params"><span class="member_param">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp;v</span>) const</span></span><a href="#__634" id="__634" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Assign new value to referenced value.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp; </span><span class="member_signature"><span class="member_name">operator=</span>(<span class="member_params"><span class="member_param">Value::<a href="Value_class_reference.html#__514">Bool</a> n</span>) const</span></span><a href="#__635" id="__635" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Assign new boolean to referenced value.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp; </span><span class="member_signature"><span class="member_name">operator=</span>(<span class="member_params"><span class="member_param">double n</span>) const</span></span><a href="#__636" id="__636" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Assign new number to referenced value.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp; </span><span class="member_signature"><span class="member_name">operator=</span>(<span class="member_params"><span class="member_param">int n</span>) const</span></span><a href="#__637" id="__637" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Assign new number to referenced value.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp; </span><span class="member_signature"><span class="member_name">operator=</span>(<span class="member_params"><span class="member_param">const <a href="String_class_reference.html">String</a> &amp;str</span>) const</span></span><a href="#__638" id="__638" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Assign new string to referenced value.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp; </span><span class="member_signature"><span class="member_name">operator=</span>(<span class="member_params"><span class="member_param">const <a href="Ref_class_reference.html">Ref</a>&lt;<a href="UserData_class_reference.html">UserData</a>&gt; &amp;ud</span>) const</span></span><a href="#__639" id="__639" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Assign new user data to referenced value.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">const <a href="ValueRef_class_reference.html">ValueRef</a> &amp; </span><span class="member_signature"><span class="member_name">operator=</span>(<span class="member_params"><span class="member_param"><span class="ext_link"><a href="http://doc.trolltech.com/4.5/qobject.html">QObject</a></span> *obj</span>) const</span></span><a href="#__640" id="__640" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Assign a wrapped QObject to reference.</p>
+</div></div></div><div class="foot"><p class="generated"><a style="float: right;" href="http://validator.w3.org/check?uri=referer">Valid XHTML 1.0 Strict</a>Generated by diaxen on Sun Jan  8 22:46:02 2012 using <a href="http://www.nongnu.org/mkdoc/">MkDoc</a></p></div></body></html>

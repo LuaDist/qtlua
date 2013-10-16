@@ -122,6 +122,15 @@ Value UserData::meta_index(State &ls, const Value &key)
   throw String("Table read access not handled by % type").arg(get_type_name());
 };
 
+bool UserData::meta_contains(State &ls, const Value &key)
+{
+  try {
+    return !meta_index(ls, key).is_nil();
+  } catch (String &e) {
+    return false;
+  }
+}
+
 Value::List UserData::meta_call(State &ls, const Value::List &args) 
 {
   throw String("Function call not handled by % type").arg(get_type_name());

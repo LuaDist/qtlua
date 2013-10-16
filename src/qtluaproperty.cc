@@ -88,7 +88,7 @@ namespace QtLua {
     if (!variant.isValid())
       throw String("Unable to get QObject property.");
 
-    return Value(Member::raw_get_object(qow.get_state(), variant.type(), variant.constData()));
+    return Value(Member::raw_get_object(qow.get_state(), variant.userType(), variant.constData()));
   }
 
   String Property::get_value_str() const

@@ -27,7 +27,7 @@
 
 namespace QtLua {
 
-ItemModel::ItemModel(Item::ptr root, QObject *parent)
+ItemModel::ItemModel(ListItem::ptr root, QObject *parent)
   : QAbstractItemModel(parent),
     _root(root)
 {
@@ -52,6 +52,9 @@ QVariant ItemModel::data(const QModelIndex &index, int role) const
 
   Item *item = static_cast<Item*>(index.internalPointer());
 
+  if (index.column())
+    return item->get_data(index.column(), role);
+
   switch (role)
     {
     case Qt::DisplayRole:
@@ -71,6 +74,9 @@ Qt::ItemFlags ItemModel::flags(const QModelIndex &index) const
     return Qt::ItemIsDropEnabled;
 
   Item *item = static_cast<Item*>(index.internalPointer());
+
+  if (index.column())
+    return item->get_flags(index.column());
 
   Qt::ItemFlags res = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 
@@ -94,9 +100,9 @@ Item::ptr ItemModel::from_mimedata(const QMimeData *data)
 bool ItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
 			     int row, int column, const QModelIndex &parent)
 {
-  ListItem *pi = dynamic_cast<ListItem*>(parent.isValid()
-					 ? static_cast<Item*>(parent.internalPointer())
-					 : _root.ptr());
+  ListItem *pi = parent.isValid()
+    ? static_cast<ListItem*>(parent.internalPointer())
+    : _root.ptr();
 
   if (!pi)		// parent is not a ListItem ?
     return false;
@@ -188,21 +194,18 @@ QVariant ItemModel::headerData(int section, Qt::Orientation orientation, int rol
 
 QModelIndex ItemModel::index(int row, int column, const QModelIndex &parent) const
 {
-  Item *p_;
-
-  if (column)
-    return QModelIndex();    
+  ListItem *p;
 
   if (!parent.isValid())
-    p_ = _root.ptr();
+    p = _root.ptr();
   else
-    p_ = static_cast<Item*>(parent.internalPointer());
+    p = static_cast<ListItem*>(parent.internalPointer());
 
-  ListItem *p = dynamic_cast<ListItem*>(p_);
-  assert(p);
+  int c = p->get_column_count();
+  assert(c > 0);
 
-  if (row < p->_child_list.size())
-    return createIndex(row, 0, p->_child_list[row].ptr());
+  if (column < c && row < p->_child_list.size())
+    return createIndex(row, column, p->_child_list[row].ptr());
   else
     return QModelIndex();
 }
@@ -213,7 +216,7 @@ QModelIndex ItemModel::parent(const QModelIndex &index) const
     return QModelIndex();
 
   Item *c = static_cast<Item*>(index.internalPointer());
-  Item *p = c->get_parent();
+  ListItem *p = c->get_parent();
 
   if (!p || p == _root.ptr())
     return QModelIndex();
@@ -235,7 +238,14 @@ int ItemModel::rowCount(const QModelIndex &parent) const
 
 int ItemModel::columnCount(const QModelIndex &parent) const
 {
-  return 1;
+  ListItem *p;
+
+  if (!parent.isValid())
+    p = _root.ptr();
+  else
+    p = static_cast<ListItem*>(parent.internalPointer());
+
+  return p->get_column_count();
 }
 
 bool ItemModel::setData(const QModelIndex & index, const QVariant & value, int role)
@@ -244,6 +254,9 @@ bool ItemModel::setData(const QModelIndex & index, const QVariant & value, int r
     return false;
 
   Item *item = static_cast<Item*>(index.internalPointer());
+
+  if (index.column())
+    return item->set_data(index.column(), role);
 
   switch (role)
     {

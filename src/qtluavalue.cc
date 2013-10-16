@@ -29,6 +29,7 @@
 #include <QtLua/String>
 #include <QtLua/State>
 
+#include <internal/Member>
 #include <internal/QObjectWrapper>
 #include <internal/TableIterator>
 
@@ -38,10 +39,18 @@ extern "C" {
 
 namespace QtLua {
 
+void Value::check_state() const
+{
+  if (!_st)
+    throw String("Can't perform operations on QtLua::Value which has no associated QtLua::State object");
+}
+
 void Value::push_value() const
 {
-  lua_pushlightuserdata(_st, (void*)this);
-  lua_rawget(_st, LUA_REGISTRYINDEX);  
+  check_state();
+  lua_State *lst = _st->_lst;
+  lua_pushlightuserdata(lst, (void*)this);
+  lua_rawget(lst, LUA_REGISTRYINDEX);  
 }
 
 int Value::empty_fcn(lua_State *st)
@@ -51,99 +60,129 @@ int Value::empty_fcn(lua_State *st)
 
 void Value::init_type_value(ValueType type)
 {
-  lua_pushlightuserdata(_st, this);
+  check_state();
+  lua_State *lst = _st->_lst;
+  lua_pushlightuserdata(lst, this);
 
   switch (type)
     {
     case TNone:
     case TNil:
-      lua_pushnil(_st);
+      lua_pushnil(lst);
       break;
 
     case TBool:
-      lua_pushboolean(_st, false);
+      lua_pushboolean(lst, false);
       break;
 
     case TNumber:
-      lua_pushnumber(_st, 0.0f);
+      lua_pushnumber(lst, 0.0f);
       break;
 
     case TString:
-      lua_pushstring(_st, "");
+      lua_pushstring(lst, "");
       break;
 
     case TTable:
-      lua_newtable(_st);
+      lua_newtable(lst);
       break;
 
     case TFunction:
-      lua_pushcfunction(_st, empty_fcn);
+      lua_pushcfunction(lst, empty_fcn);
       break;
 
     case TUserData: {
       UserData::ptr ud = QTLUA_REFNEW(QtLua::UserData, );
-      ud->push_ud(_st);
+      ud->push_ud(lst);
       break;
     }
 
     }
 
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  lua_rawset(lst, LUA_REGISTRYINDEX);
 }
 
 Value & Value::operator=(Bool n)
 {
-  lua_pushlightuserdata(_st, (void*)this);
-  lua_pushboolean(_st, n);
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  if (_st)
+    {
+      lua_State *lst = _st->_lst;
+      lua_pushlightuserdata(lst, (void*)this);
+      lua_pushboolean(lst, n);
+      lua_rawset(lst, LUA_REGISTRYINDEX);
+    }
   return *this;
 }
 
 Value & Value::operator=(double n)
 {
-  lua_pushlightuserdata(_st, (void*)this);
-  lua_pushnumber(_st, n);
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  if (_st)
+    {
+      lua_State *lst = _st->_lst;
+      lua_pushlightuserdata(lst, (void*)this);
+      lua_pushnumber(lst, n);
+      lua_rawset(lst, LUA_REGISTRYINDEX);
+    }
   return *this;
 }
 
 Value & Value::operator=(const String &str)
 {
-  lua_pushlightuserdata(_st, this);
-  lua_pushlstring(_st, str.constData(), str.size());
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  if (_st)
+    {
+      lua_State *lst = _st->_lst;
+      lua_pushlightuserdata(lst, this);
+      lua_pushlstring(lst, str.constData(), str.size());
+      lua_rawset(lst, LUA_REGISTRYINDEX);
+    }
   return *this;
 }
 
 Value & Value::operator=(const Ref<UserData> &ud)
 {
-  lua_pushlightuserdata(_st, this);
-  ud->push_ud(_st);
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  if (_st)
+    {
+      lua_State *lst = _st->_lst;
+      lua_pushlightuserdata(lst, this);
+      ud->push_ud(lst);
+      lua_rawset(lst, LUA_REGISTRYINDEX);
+    }
   return *this;
 }
 
 Value::Value(State &ls, QObject *obj, bool delete_, bool reparent)
-  : _st(ls._st)
+  : _st(&ls)
 {
-  lua_pushlightuserdata(_st, this);
-  QObjectWrapper::get_wrapper(ls, obj, reparent, delete_)->push_ud(_st);
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  lua_State *lst = _st->_lst;
+  lua_pushlightuserdata(lst, this);
+  QObjectWrapper::get_wrapper(*_st, obj, reparent, delete_)->push_ud(lst);
+  lua_rawset(lst, LUA_REGISTRYINDEX);
 }
 
 Value & Value::operator=(QObject *obj)
 {
-  lua_pushlightuserdata(_st, this);
-  QObjectWrapper::get_wrapper(get_state(), obj)->push_ud(_st);
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  if (_st)
+    {
+      lua_State *lst = _st->_lst;
+      lua_pushlightuserdata(lst, this);
+      QObjectWrapper::get_wrapper(*_st, obj)->push_ud(lst);
+      lua_rawset(lst, LUA_REGISTRYINDEX);
+    }
+  return *this;
+}
+
+Value & Value::operator=(const QVariant &qv)
+{
+  if (_st)
+    *this = Member::raw_get_object(*_st, qv.type(), qv.constData());
   return *this;
 }
 
 bool Value::connect(QObject *obj, const char *signal)
 {
+  check_state();
   try {
-    State &ls = get_state();
-    QObjectWrapper::ptr qow = QObjectWrapper::get_wrapper(ls, obj);
+    QObjectWrapper::ptr qow = QObjectWrapper::get_wrapper(*_st, obj);
     QByteArray ns(QMetaObject::normalizedSignature(signal));
     const QMetaObject *mo = obj->metaObject();
     int sigid = mo->indexOfMethod(ns.constData());
@@ -161,8 +200,8 @@ bool Value::connect(QObject *obj, const char *signal)
 
 bool Value::disconnect(QObject *obj, const char *signal)
 {
-  State &ls = get_state();
-  QObjectWrapper::ptr qow = QObjectWrapper::get_wrapper(ls, obj);
+  check_state();
+  QObjectWrapper::ptr qow = QObjectWrapper::get_wrapper(*_st, obj);
   QByteArray ns(QMetaObject::normalizedSignature(signal));
   const QMetaObject *mo = obj->metaObject();
   int sigid = mo->indexOfMethod(ns.constData());
@@ -176,122 +215,131 @@ bool Value::disconnect(QObject *obj, const char *signal)
 Value::List Value::call (const List &args) const
 {
   push_value();
+  lua_State *lst = _st->_lst;
 
-  int t = lua_type(_st, -1);
+  int t = lua_type(lst, -1);
 
   switch (t)
     {
     case TFunction: {
-      int oldtop = lua_gettop(_st);
+      int oldtop = lua_gettop(lst);
 
-      if (!lua_checkstack(_st, args.size()))
+      if (!lua_checkstack(lst, args.size()))
 	throw String("Unable to extend lua stack to handle % arguments").arg(args.size());
 
       foreach(const Value &v, args)
 	v.push_value();
 
-      if (!lua_pcall(_st, args.size(), LUA_MULTRET, 0))
+      if (!lua_pcall(lst, args.size(), LUA_MULTRET, 0))
 	{
 	  Value::List res;
 
-	  for (int i = oldtop; i <= lua_gettop(_st); i++)
-	    res += Value(_st, i);
+	  for (int i = oldtop; i <= lua_gettop(lst); i++)
+	    res += Value(i, _st);
 
-	  lua_pop(_st, lua_gettop(_st) - oldtop + 1);
+	  lua_pop(lst, lua_gettop(lst) - oldtop + 1);
 	  return res;
 	}
 
-      String err(lua_tostring(_st, -1));
-      lua_pop(_st, 1);
+      String err(lua_tostring(lst, -1));
+      lua_pop(lst, 1);
       throw err;
     }
 
     case TUserData: {
-      UserData::ptr ud = UserData::pop_ud(_st);
+      UserData::ptr ud = UserData::pop_ud(lst);
 
       if (!ud.valid())
 	throw String("Can not call null lua::userdata value.");
 
-      return ud->meta_call(get_state(), args);
+      return ud->meta_call(*_st, args);
     }
 
     default:
-      lua_pop(_st, 1);
-      throw String("Can not call lua::% value.").arg(lua_typename(_st, t));
+      lua_pop(lst, 1);
+      throw String("Can not call lua::% value.").arg(lua_typename(lst, t));
     }
 }
 
 Value Value::operator[] (const Value &key) const
 {
   push_value();
+  lua_State *lst = _st->_lst;
 
-  int t = lua_type(_st, -1);
+  int t = lua_type(lst, -1);
 
   switch (t)
     {
     case TUserData: {
-      UserData::ptr ud = UserData::pop_ud(_st);
+      UserData::ptr ud = UserData::pop_ud(lst);
 
       if (!ud.valid())
 	throw String("Can not index null lua::userdata value.");
 
-      return ud->meta_index(get_state(), key);
+      return ud->meta_index(*_st, key);
     }
 
     case TTable: {
       key.push_value();
-      lua_gettable(_st, -2);
-      Value res(_st, -1);
-      lua_pop(_st, 2);
+      lua_gettable(lst, -2);
+      Value res(-1, _st);
+      lua_pop(lst, 2);
       return res;
     }
 
     default:
-      lua_pop(_st, 1);
-      throw String("Can not index lua::% value.").arg(lua_typename(_st, t));
+      lua_pop(lst, 1);
+      throw String("Can not index lua::% value.").arg(lua_typename(lst, t));
     }
 }
 
 Ref<Iterator> Value::new_iterator() const
 {
   push_value();
+  lua_State *lst = _st->_lst;
 
-  switch (int t = lua_type(_st, -1))
+  switch (int t = lua_type(lst, -1))
     {
     case TUserData: {
-      UserData::ptr ud = UserData::pop_ud(_st);
+      UserData::ptr ud = UserData::pop_ud(lst);
 
       if (!ud.valid())
 	throw String("Can not iterate through null lua::userdata value.");
 
-      return ud->new_iterator(get_state());
+      return ud->new_iterator(*_st);
     }
 
     case TTable: {
-      Iterator::ptr it = QTLUA_REFNEW(TableIterator, _st, *this);
-      lua_pop(_st, 1);
+      Iterator::ptr it = QTLUA_REFNEW(TableIterator, *_st, *this);
+      lua_pop(lst, 1);
       return it;
     }
 
     default:
-      lua_pop(_st, 1);
-      throw String("Can not iterate through lua::% value.").arg(lua_typename(_st, t));
+      lua_pop(lst, 1);
+      throw String("Can not iterate through lua::% value.").arg(lua_typename(lst, t));
     }
 }
 
 Value & Value::operator=(const Value &lv)
 {
-  if (_st != lv._st)
+  if (_st)
     {
-      lua_pushlightuserdata(_st, this);
-      lua_pushnil(_st);
-      lua_rawset(_st, LUA_REGISTRYINDEX);
-      _st = lv._st;
+      lua_State *lst = _st->_lst;
+      lua_pushlightuserdata(lst, this);
+      lua_pushnil(lst);
+      lua_rawset(lst, LUA_REGISTRYINDEX);
     }
 
-  lua_pushlightuserdata(_st, this);
-  lv.push_value();
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  _st = lv._st;
+
+  if (_st)
+    {
+      lua_State *lst = _st->_lst;
+      lua_pushlightuserdata(lst, this);
+      lv.push_value();
+      lua_rawset(lst, LUA_REGISTRYINDEX);
+    }
 
   return *this;
 }
@@ -299,40 +347,69 @@ Value & Value::operator=(const Value &lv)
 Value::Value(const Value &lv)
   : _st(lv._st)
 {
-  lua_pushlightuserdata(_st, this);
+  if (!_st)
+    return;
+
+  lua_State *lst = _st->_lst;
+  lua_pushlightuserdata(lst, this);
   lv.push_value();
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  lua_rawset(lst, LUA_REGISTRYINDEX);
+}
+
+Value::Value(const State *ls, const Value &lv)
+  : _st(const_cast<State*>(ls))
+{
+  assert(_st == lv._st);
+
+  if (!_st)
+    return;
+
+  lua_State *lst = _st->_lst;
+  lua_pushlightuserdata(lst, this);
+  lv.push_value();
+  lua_rawset(lst, LUA_REGISTRYINDEX);
 }
 
 Value::Value(const State &ls, const Value &lv)
-  : _st(lv._st)
+  : _st(const_cast<State*>(&ls))
 {
-  assert(ls._st == lv._st);
-  lua_pushlightuserdata(_st, this);
+  assert(_st == lv._st);
+
+  lua_State *lst = _st->_lst;
+  lua_pushlightuserdata(lst, this);
   lv.push_value();
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  lua_rawset(lst, LUA_REGISTRYINDEX);
 }
 
 Value::~Value()
 {
-  lua_pushlightuserdata(_st, this);
-  lua_pushnil(_st);
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  if (_st)
+    {
+      lua_State *lst = _st->_lst;
+      lua_pushlightuserdata(lst, this);
+      lua_pushnil(lst);
+      lua_rawset(lst, LUA_REGISTRYINDEX);
+    }
 }
 
 Value::Bool Value::to_boolean() const
 {
   push_value();
-  Bool res = (Bool)lua_toboolean(_st, -1);
-  lua_pop(_st, 1);
+  lua_State *lst = _st->_lst;
+  Bool res = (Bool)lua_toboolean(lst, -1);
+  lua_pop(lst, 1);
   return res;
 }
 
 Value::ValueType Value::type() const
 {
+  if (!_st)
+    return TNil;
+
   push_value();
-  int res = lua_type(_st, -1);
-  lua_pop(_st, 1);
+  lua_State *lst = _st->_lst;
+  int res = lua_type(lst, -1);
+  lua_pop(lst, 1);
   return (Value::ValueType)res;
 }
 
@@ -348,16 +425,21 @@ String Value::type_name(enum Value::ValueType v)
 
 String Value::type_name_u() const
 {
+  if (!_st)
+    return "lua::nil";
+
+  lua_State *lst = _st->_lst;
+
   push_value();
-  int t = lua_type(_st, -1);
+  int t = lua_type(lst, -1);
 
   if (t == TUserData)
     {
 #ifndef QTLUA_NO_USERDATA_CHECK
       try {
 #endif
-	UserData::ptr ud = UserData::get_ud(_st, -1);
-	lua_pop(_st, 1);
+	UserData::ptr ud = UserData::get_ud(lst, -1);
+	lua_pop(lst, 1);
 	if (ud.valid())
 	  return ud->get_type_name();
 #ifndef QTLUA_NO_USERDATA_CHECK
@@ -366,47 +448,52 @@ String Value::type_name_u() const
 #endif
     }
 
-  lua_pop(_st, 1);
-  return String("lua::") + lua_typename(_st, t);
+  lua_pop(lst, 1);
+  return String("lua::") + lua_typename(lst, t);
 }
 
-Value::Value(lua_State *st, int index)
-  : _st(st)
-{ 
-  lua_pushlightuserdata(_st, this);
+Value::Value(int index, const State *st)
+  : _st(const_cast<State*>(st))
+{
+  lua_State *lst = _st->_lst;
+
+  lua_pushlightuserdata(lst, this);
   if (index < 0 && index != LUA_GLOBALSINDEX)
     index--;
-  lua_pushvalue(_st, index);
-  lua_rawset(_st, LUA_REGISTRYINDEX);
+  lua_pushvalue(lst, index);
+  lua_rawset(lst, LUA_REGISTRYINDEX);
 }
 
 void Value::convert_error(ValueType type) const
 {
-  int type_b = lua_type(_st, -1);
+  lua_State *lst = _st->_lst;
 
-  lua_pop(_st, 1);
+  int type_b = lua_type(lst, -1);
+
+  lua_pop(lst, 1);
 
   throw String("Can not convert lua::% value to lua::%.")
-    .arg(lua_typename(_st, type_b)).arg(lua_typename(_st, (int)type));
+    .arg(lua_typename(lst, type_b)).arg(lua_typename(lst, (int)type));
 }
 
 lua_Number Value::to_number() const
 {
   push_value();
+  lua_State *lst = _st->_lst;
 
-  switch (lua_type(_st, -1))
+  switch (lua_type(lst, -1))
     {
     case LUA_TBOOLEAN:
     case LUA_TNUMBER: {
-      lua_Number res = lua_tonumber(_st, -1);
-      lua_pop(_st, 1);
+      lua_Number res = lua_tonumber(lst, -1);
+      lua_pop(lst, 1);
       return res;
     }
 
     case LUA_TSTRING: {
       char *end;
-      lua_Number res = strtod(lua_tostring(_st, -1), &end);
-      lua_pop(_st, 1);
+      lua_Number res = strtod(lua_tostring(lst, -1), &end);
+      lua_pop(lst, 1);
 
       if (!*end)
 	return res;
@@ -421,13 +508,14 @@ lua_Number Value::to_number() const
 String Value::to_string() const
 {
   push_value();
+  lua_State *lst = _st->_lst;
 
-  const char	*str = lua_tostring(_st, -1);
+  const char	*str = lua_tostring(lst, -1);
 
   if (str)
     {
-      String res(lua_tostring(_st, -1), lua_strlen(_st, -1));
-      lua_pop(_st, 1);
+      String res(lua_tostring(lst, -1), lua_strlen(lst, -1));
+      lua_pop(lst, 1);
       return res;
     }
 
@@ -438,8 +526,10 @@ String Value::to_string() const
 String Value::to_string_p(bool quote_string) const
 {
   push_value();
-  String res(to_string_p(_st, -1, quote_string));
-  lua_pop(_st, 1);
+  lua_State *lst = _st->_lst;
+
+  String res(to_string_p(lst, -1, quote_string));
+  lua_pop(lst, 1);
   return res;
 }
 
@@ -496,12 +586,13 @@ String Value::to_string_p(lua_State *st, int index, bool quote_string)
 const char * Value::to_cstring() const
 {
   push_value();
+  lua_State *lst = _st->_lst;
 
-  const char	*str = lua_tostring(_st, -1);
+  const char	*str = lua_tostring(lst, -1);
 
   if (str)
     {
-      lua_pop(_st, 1);
+      lua_pop(lst, 1);
       return str;
     }
 
@@ -512,9 +603,10 @@ const char * Value::to_cstring() const
 UserData::ptr Value::to_userdata() const
 {
   push_value();
+  lua_State *lst = _st->_lst;
 
-  if (lua_type(_st, -1) == LUA_TUSERDATA)
-    return UserData::pop_ud(_st);
+  if (lua_type(lst, -1) == LUA_TUSERDATA)
+    return UserData::pop_ud(lst);
 
   convert_error(TUserData);
   std::abort();
@@ -523,14 +615,15 @@ UserData::ptr Value::to_userdata() const
 UserData::ptr Value::to_userdata_null() const
 {
   push_value();
+  lua_State *lst = _st->_lst;
 
-  if (lua_type(_st, -1) == LUA_TUSERDATA)
+  if (lua_type(lst, -1) == LUA_TUSERDATA)
     {
 #ifndef QTLUA_NO_USERDATA_CHECK
       try {
 #endif
-	UserData::ptr ptr = UserData::get_ud(_st, -1);
-	lua_pop(_st, 1);
+	UserData::ptr ptr = UserData::get_ud(lst, -1);
+	lua_pop(lst, 1);
 	return ptr;
 #ifndef QTLUA_NO_USERDATA_CHECK
       } catch (const String &e) {
@@ -538,8 +631,37 @@ UserData::ptr Value::to_userdata_null() const
 #endif
     }
 
-  lua_pop(_st, 1);
+  lua_pop(lst, 1);
   return UserData::ptr();
+}
+
+QObject *Value::to_qobject() const
+{
+  QObjectWrapper::ptr ow = to_userdata_cast<QObjectWrapper>();
+
+  if (!ow.valid())
+    throw String("Can not convert % type to QObject.").arg(type_name());
+
+  return &ow->get_object();
+}
+
+QVariant Value::to_qvariant() const
+{
+  switch (type())
+    {
+    case TNone:
+    case TNil:
+      return QVariant();
+    case TBool:
+      return QVariant(to_boolean());
+    case TNumber:
+      return QVariant(to_number());
+    case TString:
+      return QVariant(to_string());
+
+    default:
+      throw String("Can not convert % type to QVariant.").arg(type_name());
+    }
 }
 
 static int lua_writer(lua_State *L, const void* p, size_t sz, void* pv)
@@ -552,12 +674,13 @@ static int lua_writer(lua_State *L, const void* p, size_t sz, void* pv)
 QByteArray Value::to_bytecode() const
 {
   push_value();
+  lua_State *lst = _st->_lst;
 
-  if (lua_type(_st, -1) == LUA_TFUNCTION)
+  if (lua_type(lst, -1) == LUA_TFUNCTION)
     {
       QByteArray bytecode;
-      int status = lua_dump(_st, &lua_writer, &bytecode);	
-      lua_pop(_st, 1);
+      int status = lua_dump(lst, &lua_writer, &bytecode);	
+      lua_pop(lst, 1);
       if (status)
 	throw QtLua::String("Unable to dump function bytecode");
       return bytecode;
@@ -569,21 +692,21 @@ QByteArray Value::to_bytecode() const
 
 int Value::len() const
 {
+  push_value();
+  lua_State *lst = _st->_lst;
   size_t res;
 
-  push_value();
-
-  switch (lua_type(_st, -1))
+  switch (lua_type(lst, -1))
     {
     case TString:
     case TTable:
-      res = lua_objlen(_st, -1);
+      res = lua_objlen(lst, -1);
       break;
 
     case TUserData:
       try {
-	UserData::ptr ptr = UserData::get_ud(_st, -1);
-	res = ptr->meta_operation(get_state(), Value::OpLen, *this, *this).to_integer();
+	UserData::ptr ptr = UserData::get_ud(lst, -1);
+	res = ptr->meta_operation(*_st, Value::OpLen, *this, *this).to_integer();
 	break;
       } catch (const String &s) {
       }
@@ -592,16 +715,17 @@ int Value::len() const
       res = 0;
     }
 
-  lua_pop(_st, 1);
+  lua_pop(lst, 1);
   return res;
 }
 
 bool Value::support(Operation c) const
 {
-  bool res;
   push_value();
+  lua_State *lst = _st->_lst;
+  bool res;
 
-  switch (lua_type(_st, -1))
+  switch (lua_type(lst, -1))
     {
     case TNone:
     case TNil:
@@ -688,7 +812,7 @@ bool Value::support(Operation c) const
 
     case TUserData:
       try {
-	UserData::ptr ptr = UserData::get_ud(_st, -1);
+	UserData::ptr ptr = UserData::get_ud(lst, -1);
 	res = ptr->support(c);
       } catch (const String &s) {
 	res = false;
@@ -696,166 +820,177 @@ bool Value::support(Operation c) const
       break;
     }
 
-  lua_pop(_st, 1);
+  lua_pop(lst, 1);
   return res;
 }
 
 bool Value::operator==(const Value &lv) const
 {
-  bool res;
-
   if (lv._st != _st)
     return false;
 
   lv.push_value();
   push_value();
 
-  if ((lua_type(_st, -1) == TUserData) &&
-      (lua_type(_st, -2) == TUserData))
+  lua_State *lst = _st->_lst;
+  bool res;
+
+  if ((lua_type(lst, -1) == TUserData) &&
+      (lua_type(lst, -2) == TUserData))
     {
 #ifndef QTLUA_NO_USERDATA_CHECK
       try {
 #endif
-	UserData::ptr a = UserData::get_ud(_st, -1);
-	UserData::ptr b = UserData::get_ud(_st, -2);
+	UserData::ptr a = UserData::get_ud(lst, -1);
+	UserData::ptr b = UserData::get_ud(lst, -2);
 
 	res = (a.valid() == b.valid()) && (!a.valid() || (*a == *b));
 #ifndef QTLUA_NO_USERDATA_CHECK
       } catch (const String &e) {
-	res = lua_rawequal(_st, -1, -2);
+	res = lua_rawequal(lst, -1, -2);
       }
 #endif
     }
   else
     {
-      res = lua_equal(_st, -1, -2);
+      res = lua_equal(lst, -1, -2);
     }
 
-  lua_pop(_st, 2);
+  lua_pop(lst, 2);
   return res;
 }
 
 bool Value::operator<(const Value &lv) const
 {
-  bool res;
-
   if (lv._st != _st)
     return false;
 
   lv.push_value();
   push_value();
 
-  if ((lua_type(_st, -1) == TUserData) &&
-      (lua_type(_st, -2) == TUserData))
+  lua_State *lst = _st->_lst;
+  bool res;
+
+  if ((lua_type(lst, -1) == TUserData) &&
+      (lua_type(lst, -2) == TUserData))
     {
 #ifndef QTLUA_NO_USERDATA_CHECK
       try {
 #endif
-	UserData::ptr a = UserData::get_ud(_st, -1);
-	UserData::ptr b = UserData::get_ud(_st, -2);
+	UserData::ptr a = UserData::get_ud(lst, -1);
+	UserData::ptr b = UserData::get_ud(lst, -2);
 
 	res = a.valid() && b.valid() && (*a < *b);
 #ifndef QTLUA_NO_USERDATA_CHECK
       } catch (const String &e) {
-	res = lua_topointer(_st, -1) < lua_topointer(_st, -2);
+	res = lua_topointer(lst, -1) < lua_topointer(lst, -2);
       }
 #endif
     }
   else
     {
-      if (lua_type(_st, -1) == lua_type(_st, -2))
-	res = lua_lessthan(_st, -1, -2);
+      if (lua_type(lst, -1) == lua_type(lst, -2))
+	res = lua_lessthan(lst, -1, -2);
       else
-	res = lua_type(_st, -1) < lua_type(_st, -2);
+	res = lua_type(lst, -1) < lua_type(lst, -2);
     }
 
-  lua_pop(_st, 2);
+  lua_pop(lst, 2);
   return res;
 }
 
 bool Value::operator==(const String &str) const
 {
-  bool res = false;
   push_value();
 
-  if (lua_isstring(_st, -1))
+  lua_State *lst = _st->_lst;
+  bool res = false;
+
+  if (lua_isstring(lst, -1))
     {
-      String s(lua_tostring(_st, -1), lua_strlen(_st, -1));
+      String s(lua_tostring(lst, -1), lua_strlen(lst, -1));
 
       res = (str == s);
     }
 
-  lua_pop(_st, 1);
+  lua_pop(lst, 1);
 
   return res;
 }
 
 bool Value::operator==(const char *str) const
 {
-  bool res = false;
   push_value();
 
-  if (lua_isstring(_st, -1))
-    res = !strcmp(lua_tostring(_st, -1), str);
+  lua_State *lst = _st->_lst;
+  bool res = false;
 
-  lua_pop(_st, 1);
+  if (lua_isstring(lst, -1))
+    res = !strcmp(lua_tostring(lst, -1), str);
+
+  lua_pop(lst, 1);
 
   return res;
 }
 
 bool Value::operator==(double n) const
 {
-  bool res = false;
   push_value();
 
-  if (lua_isnumber(_st, -1))
-    res = lua_tonumber(_st, -1) == n;
+  lua_State *lst = _st->_lst;
+  bool res = false;
 
-  lua_pop(_st, 1);
+  if (lua_isnumber(lst, -1))
+    res = lua_tonumber(lst, -1) == n;
+
+  lua_pop(lst, 1);
 
   return res;
 }
 
-uint Value::qHash(lua_State *st, int index)
+uint Value::qHash(lua_State *lst, int index)
 {
-  switch (lua_type(st, index))
+  switch (lua_type(lst, index))
     {
     case LUA_TBOOLEAN:
-      return lua_toboolean(st, index);
+      return lua_toboolean(lst, index);
 
     case LUA_TNUMBER: {
-      lua_Number n = lua_tonumber(st, index);
+      lua_Number n = lua_tonumber(lst, index);
       return *(uint*)&n;
     }
 
     case LUA_TSTRING:
-      return ::qHash(String(lua_tostring(st, index), lua_strlen(st, index)));
+      return ::qHash(String(lua_tostring(lst, index), lua_strlen(lst, index)));
 
     case LUA_TUSERDATA: {
 #ifndef QTLUA_NO_USERDATA_CHECK
       try {
 #endif
-	QtLua::Ref<UserData> ud = UserData::get_ud(st, index);
+	QtLua::Ref<UserData> ud = UserData::get_ud(lst, index);
 	return (uint)(long)ud.ptr();
 #ifndef QTLUA_NO_USERDATA_CHECK
       } catch (...) {
-	return (uint)(long)lua_touserdata(st, index);
+	return (uint)(long)lua_touserdata(lst, index);
       }
 #endif
       break;
     }
 
     default:
-      return (uint)(long)lua_topointer(st, index);
+      return (uint)(long)lua_topointer(lst, index);
     }
 }
 
 uint qHash(const Value &lv)
 {
-  uint	res;
   lv.push_value();
-  res = Value::qHash(lv._st, -1);
-  lua_pop(lv._st, 1);
+
+  lua_State *lst = lv._st->_lst;
+  uint	res;
+
+  res = Value::qHash(lst, -1);
+  lua_pop(lst, 1);
   return res;
 }
 

@@ -1,4 +1,4 @@
 
-SUBDIRS = console proxy qobject userdata mvc value plugin
+SUBDIRS = console proxy qobject userdata mvc value plugin types
 
 

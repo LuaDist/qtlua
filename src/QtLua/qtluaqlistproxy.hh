@@ -21,6 +21,8 @@
 #ifndef QTLUALISTPROXY_HH_
 #define QTLUALISTPROXY_HH_
 
+#include <QPointer>
+
 #include "qtluauserdata.hh"
 #include "qtluaiterator.hh"
 
@@ -53,21 +55,24 @@ public:
   void set_container(Container *list);
 
   Value meta_index(State &ls, const Value &key);
+  bool meta_contains(State &ls, const Value &key);
   Ref<Iterator> new_iterator(State &ls);
   Value meta_operation(State &ls, Value::Operation op, const Value &a, const Value &b);
-  virtual bool support(Value::Operation c) const;
+  bool support(Value::Operation c) const;
 
 private:
 
+  String get_type_name() const;
+
   /**
-   * @short QListProxyRo iterator class (internal)
+   * @short QListProxyRo iterator class
    * @internal
    */
   class ProxyIterator : public Iterator
   {
   public:
     QTLUA_REFTYPE(ProxyIterator);
-    ProxyIterator(State &ls, const Ref<QListProxyRo> &proxy);
+    ProxyIterator(State *ls, const Ref<QListProxyRo> &proxy);
 
   private:
     bool more() const;
@@ -76,7 +81,7 @@ private:
     Value get_value() const;
     ValueRef get_value_ref();
 
-    State &_ls;
+    QPointer<State> _ls;
     typename QListProxyRo::ptr _proxy;
     typename Container::const_iterator _it;
     unsigned int _i;

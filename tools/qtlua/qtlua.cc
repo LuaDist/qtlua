@@ -26,19 +26,23 @@
 #include <QApplication>
 #include <QFile>
 #include <QDialog>
+#include <QSettings>
+#include <QPointer>
 
 #include <QtLua/State>
 #include <QtLua/Console>
 
 #include "config.hh"
 
-#define QTLUA_COPYRIGHT "QtLua " PACKAGE_VERSION " Copyright (C) 2008-2010, Alexandre Becoulet"
+#define QTLUA_COPYRIGHT "QtLua " PACKAGE_VERSION " Copyright (C) 2008-2011, Alexandre Becoulet"
 
 int main(int argc, char *argv[])
 {
   try {
     QApplication app(argc, argv);
     QStringList args = app.arguments();
+    QPointer<QtLua::Console> console(0);
+    QSettings settings("QtLua", "qtlua tool");
 
     bool interactive = argc == 1;
     bool execute = interactive;
@@ -82,7 +86,9 @@ int main(int argc, char *argv[])
 
     if (interactive)
       {
-	QtLua::Console *console = new QtLua::Console(0, ">>");
+	console = new QtLua::Console(0, ">>");
+
+	console->load_history(settings);
 
 	QObject::connect(console, SIGNAL(line_validate(const QString&)),
 			 &state, SLOT(exec(const QString&)));
@@ -94,11 +100,15 @@ int main(int argc, char *argv[])
 		console, SLOT(print(const QString&)));
 
 	console->print(QTLUA_COPYRIGHT "\n");
+	console->print("You may type: help(), list() and use TAB completion.\n");
 	console->show();
       }
 
     if (execute)
       app.exec();
+
+    if (console)
+      console->save_history(settings);
 
   } catch (QtLua::String &e) {
     std::cerr << e.constData() << std::endl;

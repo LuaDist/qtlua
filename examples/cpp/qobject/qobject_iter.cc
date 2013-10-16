@@ -25,6 +25,7 @@
 int main()
 {
   QtLua::State state;
+  state.openlib(QtLua::QtLuaLib);
 
   QAction object(0);
 

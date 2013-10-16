@@ -119,7 +119,7 @@ namespace QtLua {
   private:
 
     /**
-     * @short Ref counted plugin loader object (internal)
+     * @short Ref counted plugin loader object
      * @internal 
      */
     struct Loader : public QPluginLoader, public UserData

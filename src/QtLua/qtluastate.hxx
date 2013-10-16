@@ -37,6 +37,11 @@ namespace QtLua {
     return (*this)[Value(*this, key)];
   }
 
+  void State::output_str(const String &str)
+  {
+    output(str.to_qstring());
+  }
+
 }
 
 #endif

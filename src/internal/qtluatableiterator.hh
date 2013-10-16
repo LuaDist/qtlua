@@ -21,12 +21,14 @@
 #ifndef QTLUATABLEITERATOR_HH_
 #define QTLUATABLEITERATOR_HH_
 
+#include <QPointer>
+
 #include <QtLua/qtluaiterator.hh>
 
 namespace QtLua {
 
 /**
- * @short Lua table iterator class (internal)
+ * @short Lua table iterator class
  * @header internal/TableIterator
  * @module {Base}
  * @internal
@@ -42,7 +44,7 @@ class TableIterator : public Iterator
 public:
   QTLUA_REFTYPE(TableIterator);
 
-  TableIterator(lua_State *st, const Value &table);
+  TableIterator(State &st, const Value &table);
   ~TableIterator();
 
 private:
@@ -53,7 +55,7 @@ private:
   Value get_value() const;
   ValueRef get_value_ref();
 
-  lua_State *_st;
+  QPointer<State> _st;
   Value _key;
   Value _value;
   bool _more;

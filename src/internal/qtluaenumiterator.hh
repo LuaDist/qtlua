@@ -21,14 +21,15 @@
 #ifndef QTLUAENUMITERATOR_HH_
 #define QTLUAENUMITERATOR_HH_
 
-#include <QtLua/qtluaiterator.hh>
-
 #include <QMetaEnum>
+#include <QPointer>
+
+#include <QtLua/qtluaiterator.hh>
 
 namespace QtLua {
 
 /**
- * @short Qt enum iterator class (internal)
+ * @short Qt enum iterator class
  * @header internal/EnumIterator
  * @module {QObject wrapping}
  * @internal
@@ -54,7 +55,7 @@ private:
   Value get_value() const;
   ValueRef get_value_ref();
 
-  State &_ls;
+  QPointer<State> _ls;
   QMetaEnum _me;
   int _index;
 };

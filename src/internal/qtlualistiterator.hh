@@ -21,13 +21,15 @@
 #ifndef QTLUALISTITERATOR_HH_
 #define QTLUALISTITERATOR_HH_
 
+#include <QPointer>
+
 #include <QtLua/qtluaiterator.hh>
 #include <QtLua/qtlualistitem.hh>
 
 namespace QtLua {
 
 /**
- * @short Qt Model/View list item iterator class (internal)
+ * @short Qt Model/View list item iterator class
  * @header internal/ListIterator
  * @module {Model/View}
  * @internal
@@ -52,7 +54,7 @@ private:
   Value get_value() const;
   ValueRef get_value_ref();
 
-  State &_ls;
+  QPointer<State> _ls;
   ListItem::ptr _list;
   QList<Item::ptr>::const_iterator _it;
 };

@@ -36,7 +36,7 @@ namespace QtLua {
   typedef QHash<const QMetaObject *, MetaCache> meta_cache_t;
 
 /**
- * @short Cache of existing Qt meta member wrappers (internal)
+ * @short Cache of existing Qt meta member wrappers
  * @header internal/MetaCache
  * @module {QObject wrapping}
  * @internal

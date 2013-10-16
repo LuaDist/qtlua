@@ -6,6 +6,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #cmakedefine HAVE_INTTYPES_H ${HAVE_INTTYPES_H}
 
+/* Define to 1 if you have the `dl' library (-ldl). */
+#cmakedefine HAVE_LIBDL ${HAVE_LIBDL}
+
 /* Define to 1 if you have the `m' library (-lm). */
 #cmakedefine HAVE_LIBM ${HAVE_LIBM}
 

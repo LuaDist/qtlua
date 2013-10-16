@@ -21,10 +21,26 @@
 #ifndef QTLUAQHASHPROXY_HH_
 #define QTLUAQHASHPROXY_HH_
 
+#include <QPointer>
+
 #include "qtluauserdata.hh"
 #include "qtluaiterator.hh"
 
 namespace QtLua {
+
+  /** @module {Container proxies} @internal */
+  template <typename T>
+  struct QHashProxyKeytype
+  {
+    static inline void completion_patch(String &path, String &entry, int &offset);
+  };
+
+  /** @module {Container proxies} @internal */
+  template <>
+  struct QHashProxyKeytype<String>
+  {
+    static inline void completion_patch(String &path, String &entry, int &offset);
+  };
 
   /**
    * @short QHash and QMap read only access wrapper for lua script
@@ -53,22 +69,24 @@ public:
   void set_container(Container *hash);
 
   Value meta_index(State &ls, const Value &key);
+  bool meta_contains(State &ls, const Value &key);
   Ref<Iterator> new_iterator(State &ls);
   Value meta_operation(State &ls, Value::Operation op, const Value &a, const Value &b);
-  virtual bool support(Value::Operation c) const;
+  bool support(Value::Operation c) const;
 
 private:
-  virtual void completion_patch(String &path, String &entry, int &offset);
+  void completion_patch(String &path, String &entry, int &offset);
+  String get_type_name() const;
 
   /**
-   * @short QHashProxyRo iterator class (internal)
+   * @short QHashProxyRo iterator class
    * @internal
    */
   class ProxyIterator : public Iterator
   {
   public:
     QTLUA_REFTYPE(ProxyIterator);
-    ProxyIterator(State &ls, const Ref<QHashProxyRo> &proxy);
+    ProxyIterator(State *ls, const Ref<QHashProxyRo> &proxy);
 
   private:
     bool more() const;
@@ -77,7 +95,7 @@ private:
     Value get_value() const;
     ValueRef get_value_ref();
 
-    State &_ls;
+    QPointer<State> _ls;
     typename QHashProxyRo::ptr _proxy;
     typename Container::iterator _it;
   };

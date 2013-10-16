@@ -1,9 +1,10 @@
 include $(top_srcdir)/build/autotroll.mk
 
 noinst_PROGRAMS = plugin_load
-lib_LTLIBRARIES = plugin.la
+noinst_LTLIBRARIES = plugin.la
 
-plugin_la_SOURCES = plugin.cc plugin.moc.cc plugin.hh
+plugin_la_SOURCES = plugin.cc plugin.hh
+nodist_plugin_la_SOURCES = plugin.moc.cc
 
 QT_CPPFLAGS += -I$(top_srcdir)/src
 
@@ -19,4 +20,3 @@ plugin_load_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags)
 plugin_load_LDADD   = $(QT_LIBS) $(LDADD) $(top_builddir)/src/libqtlua.la
 
 BUILT_SOURCES = plugin.moc.cc
-

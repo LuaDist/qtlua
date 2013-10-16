@@ -3,7 +3,9 @@ include $(top_srcdir)/build/autotroll.mk
 
 noinst_PROGRAMS = qmapproxy_string qhashproxy_value		\
 		  qvectorproxy_string qvectorproxy_userdata	\
-		  qlistproxy_string qlinkedlistproxy_string
+		  qlistproxy_string qlinkedlistproxy_string	\
+		  qhashproxy_variant dispatchproxy_string	\
+		  arrayproxy_string
 
 qmapproxy_string_SOURCES = qmapproxy_string.cc
 qmapproxy_string_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
@@ -16,6 +18,12 @@ qhashproxy_value_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
 qhashproxy_value_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS) -I$(top_srcdir)/src
 qhashproxy_value_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags)
 qhashproxy_value_LDADD   = $(QT_LIBS) $(LDADD) $(top_builddir)/src/libqtlua.la
+
+qhashproxy_variant_SOURCES = qhashproxy_variant.cc
+qhashproxy_variant_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
+qhashproxy_variant_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS) -I$(top_srcdir)/src
+qhashproxy_variant_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags)
+qhashproxy_variant_LDADD   = $(QT_LIBS) $(LDADD) $(top_builddir)/src/libqtlua.la
 
 qvectorproxy_string_SOURCES = qvectorproxy_string.cc
 qvectorproxy_string_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
@@ -41,5 +49,14 @@ qlinkedlistproxy_string_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS) -I$(top_srcdir)
 qlinkedlistproxy_string_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags)
 qlinkedlistproxy_string_LDADD   = $(QT_LIBS) $(LDADD) $(top_builddir)/src/libqtlua.la
 
-#BUILT_SOURCES = 
+dispatchproxy_string_SOURCES = dispatchproxy_string.cc
+dispatchproxy_string_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
+dispatchproxy_string_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS) -I$(top_srcdir)/src
+dispatchproxy_string_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags)
+dispatchproxy_string_LDADD   = $(QT_LIBS) $(LDADD) $(top_builddir)/src/libqtlua.la
 
+arrayproxy_string_SOURCES = arrayproxy_string.cc
+arrayproxy_string_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
+arrayproxy_string_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS) -I$(top_srcdir)/src
+arrayproxy_string_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS) $(libtool_flags)
+arrayproxy_string_LDADD   = $(QT_LIBS) $(LDADD) $(top_builddir)/src/libqtlua.la

@@ -8,3 +8,7 @@
  from both lua and C++. It takes advantages of the Qt meta object
  system to expose @ref QObject members to lua scripts.
 
+ QtLua is not designed to develop an application in pure Lua but
+ rather to extend a Qt C++ application using Lua as scripting
+ language.
+

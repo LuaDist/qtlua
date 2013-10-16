@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ <meta name="Generator" content="MKDOC " />
+ <title>QtLua library manual </title>
+ <link rel="stylesheet" href="mkdoc.css" />
+ <style type="text/css">
+
+  .sec_hidden { display: none; }
+  .sec_shown {}
+ </style>
+</head><body>
+<div class="page"><div class="head"><img class="headlogo" src="logo-small.png" alt="logo" /><div class="headlinks"><a href="Table_of_contents.html">Table of contents</a>
+ &nbsp; <a href="API_documentation.html">API documentation</a>
+</div><div class="navlinks"><a href="index.html" accesskey="t">Top</a> &nbsp; <a href="QHashProxyRo_plugin_map_t_ProxyIterator_internal_class_members.html"  accesskey="p" id="nav_prev">Previous </a> &nbsp; <a href="API_documentation.html"  accesskey="u" id="nav_up"> Up </a> &nbsp; <a href="QLinkedListProxy_ProxyIterator_internal_class_members.html"  accesskey="n" id="nav_next"> Next</a></div>
+</div><div class="content"><div style="clear: both; height:20px;"></div>
+<h1>QLinkedListProxy class reference<br /><span class="subtitle">
+[Container proxies module]</span>
+</h1><div class="sec_content1">
+<div style="clear: both; height:20px;"></div>
+<div class="tree_frame" style="width:180px;"><div class="tree_row"><div style="width:40px;" class="tree_pad"></div><div style="width:100px;" class="tree_public"><a href="UserData_class_reference.html">UserData</a></div
+></div><br/><div style="width:90px;" class="tree_connect_1">&nbsp;</div
+><div style="width:90px;" class="tree_connect_4">&nbsp;</div><br/><div style="width:90px;" class="tree_connect_1">&nbsp;</div
+><div style="width:90px;" class="tree_connect_4">&nbsp;</div><br/><div class="tree_row"><div style="width:180px;" class="tree_this"><a href="QLinkedListProxy_class_reference.html">QLinkedListProxy</a></div
+></div><br/></div>
+</div><h2>Declaration<a href="#_Declaration15" id="_Declaration15" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+<div class="codebox"><code><span class="codedir">#include</span> &lt;QtLua/QLinkedListProxy&gt;<br /><br /><span class="codekw">namespace</span> QtLua {<br />  <span class="codekw">template</span> &lt;<span class="codekw">typename</span> Container&gt; <span class="codekw">class</span> QLinkedListProxy;<br />};<br /></code></div><p> This class is a member of the <a href="QtLua_namespace_reference.html">QtLua</a> namespace.</p>
+</div><h2>Description<a href="#_Description16" id="_Description16" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+<p>This template class may be used to iterate over an attached <span class="ext_link"><a href="http://doc.trolltech.com/4.5/qlinkedlist.html">QLinkedList</a></span> container object from lua script.</p>
+<p>Containers may be attached and detached from the wrapper object to solve cases where we want to destroy the container when lua still holds references to the wrapper object. When no container is attached access will raise an error.</p>
+</div><h2>Members<a href="#_Members15" id="_Members15" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+</div><h3>Inherited members<a href="#_Inherited_members10" id="_Inherited_members10" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li>20 members inherited from <a href="UserData_class_reference.html">UserData</a></li>
+</ul>
+</div><h3>Types<a href="#_Types10" id="_Types10" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li><span class="listitem"><span class="member_prefix">typedef <em> [...] </em> </span><span class="member_signature"><span class="member_name"><a href="QLinkedListProxy_class_reference.html#__236">const_ptr</a></span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">typedef <em> [...] </em> </span><span class="member_signature"><span class="member_name"><a href="QLinkedListProxy_class_reference.html#__238">ptr</a></span></span></span></li>
+</ul>
+</div><h3>Functions<a href="#_Functions14" id="_Functions14" class="hover_link">&nbsp;&nbsp;</a></h3><div class="sec_content3">
+<ul><li><span class="listitem"><span class="member_prefix"></span><span class="member_signature"><span class="member_name"><a href="QLinkedListProxy_class_reference.html#__234">QLinkedListProxy</a></span>(<span class="member_params">)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix"></span><span class="member_signature"><span class="member_name"><a href="QLinkedListProxy_class_reference.html#__235">QLinkedListProxy</a></span>(<span class="member_params"><span class="member_param">Container &amp;list</span>)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">virtual Ref&lt;Iterator&gt; </span><span class="member_signature"><span class="member_name"><a href="QLinkedListProxy_class_reference.html#__237">new_iterator</a></span>(<span class="member_params"><span class="member_param">State &amp;ls</span>)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">void </span><span class="member_signature"><span class="member_name"><a href="QLinkedListProxy_class_reference.html#__239">set_container</a></span>(<span class="member_params"><span class="member_param">Container *list</span>)</span></span></span></li>
+<li><span class="listitem"><span class="member_prefix">virtual bool </span><span class="member_signature"><span class="member_name"><a href="QLinkedListProxy_class_reference.html#__240">support</a></span>(<span class="member_params"><span class="member_param">Value::Operation c</span>) const</span></span></span></li>
+</ul>
+</div><h2>Members detail<a href="#_Members_detail15" id="_Members_detail15" class="hover_link">&nbsp;&nbsp;</a></h2><div class="sec_content2">
+</div><div class="divmember public_member"><h3><span class="member_prefix"></span><span class="member_signature"><span class="member_name">QLinkedListProxy</span>(<span class="member_params">)</span></span><a href="#__234" id="__234" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Create a <a href="QListProxy_class_reference.html">QListProxy</a> object with no attached container</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix"></span><span class="member_signature"><span class="member_name">QLinkedListProxy</span>(<span class="member_params"><span class="member_param">Container &amp;list</span>)</span></span><a href="#__235" id="__235" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Create a <a href="QListProxy_class_reference.html">QListProxy</a> object and attach given container</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">typedef <a href="Ref_class_reference.html">Ref</a>&lt;const <a href="QLinkedListProxy_class_reference.html">QLinkedListProxy</a>, <a href="QLinkedListProxy_class_reference.html">QLinkedListProxy</a>&gt; </span><span class="member_signature"><span class="member_name">const_ptr</span></span><a href="#__236" id="__236" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Shortcut for <a href="Ref_class_reference.html">Ref</a> smart pointer class to QLinkedListProxy type provided for convenience</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">virtual <a href="Ref_class_reference.html">Ref</a>&lt;<a href="Iterator_class_reference.html">Iterator</a>&gt; </span><span class="member_signature"><span class="member_name">new_iterator</span>(<span class="member_params"><span class="member_param"><a href="State_class_reference.html">State</a> &amp;ls</span>)</span></span><a href="#__237" id="__237" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>This virtual function overrides the <code><a href="UserData_class_reference.html#__439">new_iterator</a></code> virtual function defined in the <code><a href="UserData_class_reference.html">UserData</a></code> base class.</p>
+<p><span class="nodoc">Documentation inherited from base class:</span></p>
+<p>This function may return an <a href="Iterator_class_reference.html">Iterator</a> object used to iterate over an userdata object. The default implementation throws an error message. The UserData::<a href="UserData_class_reference.html#__443">support</a> function must be reimplemented along with this function to report Value::<a href="Value_class_reference.html#__515">OpIterate</a> as supported.</p>
+<p>The return value is an <a href="Iterator_class_reference.html">Iterator</a> based iterator object.</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">typedef <a href="Ref_class_reference.html">Ref</a>&lt;<a href="QLinkedListProxy_class_reference.html">QLinkedListProxy</a>, <a href="QLinkedListProxy_class_reference.html">QLinkedListProxy</a>&gt; </span><span class="member_signature"><span class="member_name">ptr</span></span><a href="#__238" id="__238" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Shortcut for <a href="Ref_class_reference.html">Ref</a> smart pointer class to QLinkedListProxy type provided for convenience</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">void </span><span class="member_signature"><span class="member_name">set_container</span>(<span class="member_params"><span class="member_param">Container *list</span>)</span></span><a href="#__239" id="__239" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>Attach or detach container. argument may be NULL</p>
+</div><div class="divmember public_member"><h3><span class="member_prefix">virtual bool </span><span class="member_signature"><span class="member_name">support</span>(<span class="member_params"><span class="member_param">Value::<a href="Value_class_reference.html#__515">Operation</a> c</span>) const</span></span><a href="#__240" id="__240" class="hover_link">&nbsp;&nbsp;</a></h3></div><div class="sec_content3">
+<p>This virtual function overrides the <code><a href="UserData_class_reference.html#__443">support</a></code> virtual function defined in the <code><a href="UserData_class_reference.html">UserData</a></code> base class.</p>
+<p><span class="nodoc">Documentation inherited from base class:</span></p>
+<p>Check given operation support. </p>
+<p>See also Value::<a href="Value_class_reference.html#__578">support</a> function.</p>
+</div></div></div><div class="foot"><p class="generated"><a style="float: right;" href="http://validator.w3.org/check?uri=referer">Valid XHTML 1.0 Strict</a>Generated by diaxen on Sun Jan  8 22:46:02 2012 using <a href="http://www.nongnu.org/mkdoc/">MkDoc</a></p></div></body></html>

@@ -54,5 +54,5 @@
  @end list
 
  The library has been successfully tested with lua versions from 5.0 to 5.1
- and with Qt versions from 4.2 to 4.5.
+ and with Qt versions from 4.2 to 4.7.
 
