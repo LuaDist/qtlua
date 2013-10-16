@@ -172,6 +172,7 @@ target_link_libraries ( iterate qtlua )
 # install
 install_executable ( qtlua_app )
 install_library ( qtlua )
+install_header( src/QtLua )
 install ( TARGETS test_value test_table test_qobject_arg test_item DESTINATION ${INSTALL_TEST} COMPONENT Test )
 install_example ( examples/lua/hello INTO lua )
 install ( TARGETS console itemtreeview tablegridview tabletreeview plugin plugin_app
